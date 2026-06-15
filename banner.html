@@ -1,0 +1,206 @@
+<!-- admin/banner.html -->
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Banners - Admin</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        body {
+            max-width: 100%;
+            margin: 0;
+            background: linear-gradient(135deg, #BAE6FD 0%, #E0F2FE 100%);
+            min-height: 100vh;
+        }
+
+        .admin-layout {
+            display: grid;
+            grid-template-columns: 240px 1fr;
+            min-height: 100vh;
+            width: 100%;
+        }
+
+        .sidebar {
+            background: white;
+            padding: 20px;
+            border-right: 1px solid #E2E8F0;
+        }
+
+        .sidebar-menu {
+            list-style: none;
+            margin-top: 30px;
+        }
+
+        .sidebar-menu a {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            text-decoration: none;
+            color: var(--text-gray);
+            border-radius: 8px;
+        }
+
+        .sidebar-menu a.active {
+            background: var(--primary);
+            color: white;
+        }
+
+        .content {
+            padding: 40px;
+        }
+
+        .form-card {
+            background: white;
+            padding: 24px;
+            border-radius: 16px;
+            max-width: 600px;
+            margin-bottom: 30px;
+        }
+
+        .banner-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 20px;
+        }
+
+        .banner-card-preview {
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            position: relative;
+        }
+
+        .banner-card-preview img {
+            width: 100%;
+            height: 120px;
+            object-fit: cover;
+        }
+
+        .delete-btn-overlay {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: rgba(239, 68, 68, 0.9);
+            color: white;
+            border: none;
+            padding: 8px;
+            border-radius: 50%;
+            cursor: pointer;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="admin-layout">
+        <aside class="sidebar">
+            <ul class="sidebar-menu">
+                <li><a href="index.html"><i class="fa-solid fa-chart-line"></i> Dashboard</a></li>
+                <li><a href="orders.html"><i class="fa-solid fa-list"></i> INR Orders</a></li>
+                <li><a href="payments.html"><i class="fa-solid fa-receipt"></i> Payment Approvals</a></li>
+                <li><a href="selling_requests.html"><i class="fa-solid fa-hand-holding-dollar"></i> Selling Requests</a>
+                </li>
+                <li><a href="users.html"><i class="fa-solid fa-users"></i> Users Management</a></li>
+                <li><a href="gift_codes.html"><i class="fa-solid fa-gift"></i> Gift Codes</a></li>
+                <li><a href="banner.html" class="active"><i class="fa-solid fa-image"></i> Banners</a></li>
+                <li><a href="tutorial.html"><i class="fa-solid fa-graduation-cap"></i> Tutorials</a></li>
+                <li><a href="popups.html"><i class="fa-solid fa-window-maximize"></i> App Popups</a></li>
+                <li><a href="settings.html"><i class="fa-solid fa-gear"></i> App Settings</a></li>
+                <li><a href="../index.html" style="color: var(--danger); margin-top: 20px;"><i
+                            class="fa-solid fa-arrow-left"></i> Exit Admin</a></li>
+            </ul>
+        </aside>
+
+        <main class="content">
+            <h1>Manage Banners</h1>
+
+            <div class="form-card" style="margin-top: 20px;">
+                <h3>Update Home Banner</h3>
+                <p style="font-size: 13px; color: var(--text-gray); margin-bottom: 20px;">
+                    Paste an image URL to instantly update the homepage banner.
+                </p>
+                <div style="display: flex; flex-direction: column; gap: 16px;">
+                    <input type="text" id="bannerUrlInput" class="input-field"
+                        placeholder="https://example.com/banner.jpg" style="padding-left: 16px;">
+                    <button id="updateBannerUrlBtn" class="btn-gradient">Update Banner URL</button>
+                </div>
+            </div>
+
+            <div class="form-card">
+                <h3>Current Banner Preview</h3>
+                <div id="currentBannerPreview" class="banner-card-preview"
+                    style="height: 200px; background: #f0f0f0; display: flex; align-items: center; justify-content: center;">
+                    <img src="" alt="No banner set" id="previewImg"
+                        style="width: 100%; height: 100%; object-fit: cover;">
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script type="module">
+        import { auth, db } from "./js/firebase.js";
+        import { doc, onSnapshot, setDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+        import { initPopup, showPopup } from "./js/utils.js";
+
+        initPopup();
+
+        const bannerUrlInput = document.getElementById('bannerUrlInput');
+        const updateBtn = document.getElementById('updateBannerUrlBtn');
+        const previewImg = document.getElementById('previewImg');
+
+        // Admin Session Check
+        if (localStorage.getItem('adminSession') !== 'active') {
+            window.location.href = "login.html";
+        }
+
+        // Load current banner
+        onSnapshot(doc(db, "settings", "banner"), (snap) => {
+            if (snap.exists()) {
+                const data = snap.data();
+                if (data.image) {
+                    previewImg.src = data.image;
+                    bannerUrlInput.value = data.image;
+                }
+            }
+        });
+
+        updateBtn.addEventListener('click', async () => {
+            const url = bannerUrlInput.value.trim();
+            if (!url) {
+                showPopup("Please enter a valid image URL");
+                return;
+            }
+
+            // Simple URL validation
+            if (!url.startsWith('http')) {
+                showPopup("URL must start with http:// or https://");
+                return;
+            }
+
+            updateBtn.innerText = "Updating...";
+            updateBtn.disabled = true;
+
+            try {
+                // Ensure collection 'settings' and document 'banner'
+                await setDoc(doc(db, "settings", "banner"), {
+                    image: url,
+                    updatedAt: Date.now()
+                });
+                showPopup("Banner updated successfully!");
+            } catch (error) {
+                console.error("Banner Update Error:", error);
+                showPopup("Error: " + error.message);
+            } finally {
+                updateBtn.innerText = "Update Banner URL";
+                updateBtn.disabled = false;
+            }
+        });
+    </script>
+</body>
+
+</html>

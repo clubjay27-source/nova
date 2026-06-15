@@ -1,0 +1,438 @@
+<!-- admin/settings.html -->
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>App Settings - Admin</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        body {
+            max-width: 100%;
+            margin: 0;
+            background: linear-gradient(135deg, #BAE6FD 0%, #E0F2FE 100%);
+            min-height: 100vh;
+        }
+
+        .admin-layout {
+            display: grid;
+            grid-template-columns: 240px 1fr;
+            min-height: 100vh;
+            width: 100%;
+        }
+
+        .sidebar {
+            background: white;
+            padding: 20px;
+            border-right: 1px solid #E2E8F0;
+        }
+
+        .sidebar-menu {
+            list-style: none;
+            margin-top: 30px;
+        }
+
+        .sidebar-menu a {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            text-decoration: none;
+            color: var(--text-gray);
+            border-radius: 8px;
+        }
+
+        .sidebar-menu a.active {
+            background: var(--primary);
+            color: white;
+        }
+
+        .content {
+            padding: 40px;
+        }
+
+        .form-card {
+            background: white;
+            padding: 24px;
+            border-radius: 16px;
+            max-width: 500px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="admin-layout">
+        <aside class="sidebar">
+            <ul class="sidebar-menu">
+                <li><a href="index.html"><i class="fa-solid fa-chart-line"></i> Dashboard</a></li>
+                <li><a href="orders.html"><i class="fa-solid fa-list"></i> INR Orders</a></li>
+                <li><a href="payments.html"><i class="fa-solid fa-receipt"></i> Payment Approvals</a></li>
+                <li><a href="selling_requests.html"><i class="fa-solid fa-hand-holding-dollar"></i> Selling Requests</a>
+                </li>
+                <li><a href="users.html"><i class="fa-solid fa-users"></i> Users Management</a></li>
+                <li><a href="gift_codes.html"><i class="fa-solid fa-gift"></i> Gift Codes</a></li>
+                <li><a href="banner.html"><i class="fa-solid fa-image"></i> Banners</a></li>
+                <li><a href="tutorial.html"><i class="fa-solid fa-graduation-cap"></i> Tutorials</a></li>
+                <li><a href="popups.html"><i class="fa-solid fa-window-maximize"></i> App Popups</a></li>
+                <li><a href="settings.html" class="active"><i class="fa-solid fa-gear"></i> App Settings</a></li>
+                <li><a href="../index.html" style="color: var(--danger); margin-top: 20px;"><i
+                            class="fa-solid fa-arrow-left"></i> Exit Admin</a></li>
+            </ul>
+        </aside>
+
+        <main class="content">
+            <h1>App Settings</h1>
+
+            <div class="form-card" style="margin-top: 30px;">
+                <form id="settingsForm" style="display: flex; flex-direction: column; gap: 20px;">
+                    <div>
+                        <label style="font-size: 13px; color: var(--text-gray);">USDT Our Price</label>
+                        <input type="number" id="usdtPrice" class="input-field" step="0.01" style="padding-left: 16px;"
+                            required>
+                    </div>
+                    <div>
+                        <label style="font-size: 13px; color: var(--text-gray);">USDT Market Price</label>
+                        <input type="number" id="marketPrice" class="input-field" step="0.01"
+                            style="padding-left: 16px;" required>
+                    </div>
+                    <div style="display: flex; gap: 10px;">
+                        <div style="flex: 1;">
+                            <label style="font-size: 13px; color: var(--text-gray);">Payment UPI 1</label>
+                            <input type="text" id="paymentUpi1" class="input-field" style="padding-left: 16px;"
+                                required>
+                        </div>
+                        <div style="flex: 1;">
+                            <label style="font-size: 13px; color: var(--text-gray);">Payment UPI 2</label>
+                            <input type="text" id="paymentUpi2" class="input-field" style="padding-left: 16px;">
+                        </div>
+                        <div style="flex: 1;">
+                            <label style="font-size: 13px; color: var(--text-gray);">Payment UPI 3</label>
+                            <input type="text" id="paymentUpi3" class="input-field" style="padding-left: 16px;">
+                        </div>
+                    </div>
+                    <div style="display: flex; gap: 10px;">
+                        <div style="flex: 1;">
+                            <label style="font-size: 13px; color: var(--text-gray);">Admin QR 1 URL</label>
+                            <input type="text" id="qrUrl1" class="input-field" style="padding-left: 16px;">
+                        </div>
+                        <div style="flex: 1;">
+                            <label style="font-size: 13px; color: var(--text-gray);">Admin QR 2 URL</label>
+                            <input type="text" id="qrUrl2" class="input-field" style="padding-left: 16px;">
+                        </div>
+                        <div style="flex: 1;">
+                            <label style="font-size: 13px; color: var(--text-gray);">Admin QR 3 URL</label>
+                            <input type="text" id="qrUrl3" class="input-field" style="padding-left: 16px;">
+                        </div>
+                    </div>
+                    <div>
+                        <label style="font-size: 13px; color: var(--text-gray);">Global Reward % (USDT per
+                            order)</label>
+                        <input type="number" id="rewardPercent" class="input-field" step="0.01"
+                            style="padding-left: 16px;" value="5.90">
+                    </div>
+                    <div>
+                        <label style="font-size: 13px; color: var(--text-gray);">INR Reward % (Rupee orders)</label>
+                        <input type="number" id="rewardPercentRupee" class="input-field" step="0.01"
+                            style="padding-left: 16px;" value="3.50">
+                    </div>
+                    <div>
+                        <label style="font-size: 13px; color: var(--text-gray);">Status Description Text</label>
+                        <textarea id="statusDescription" class="input-field"
+                            style="padding: 12px; height: 80px;"></textarea>
+                    </div>
+                    <div>
+                        <label style="font-size: 13px; color: var(--text-gray);">Select Tool Warning Text</label>
+                        <textarea id="toolWarning" class="input-field" style="padding: 12px; height: 80px;"></textarea>
+                    </div>
+                    <div>
+                        <label style="font-size: 13px; color: var(--text-gray);">TG Support Link</label>
+                        <input type="text" id="tgSupport" class="input-field" style="padding-left: 16px;">
+                    </div>
+                    <div>
+                        <label style="font-size: 13px; color: var(--text-gray);">TG Group Link</label>
+                        <input type="text" id="tgGroup" class="input-field" style="padding-left: 16px;">
+                    </div>
+                    <div>
+                        <label style="font-size: 13px; color: var(--text-gray);">Welcome Bonus (New Users)</label>
+                        <input type="number" id="welcomeBonus" class="input-field" style="padding-left: 16px;"
+                            value="100">
+                    </div>
+                    <div style="display: flex; gap: 20px;">
+                        <div style="flex: 1;">
+                            <label style="font-size: 13px; color: var(--text-gray);">Default Order Min (266)</label>
+                            <input type="number" id="defaultOrderMin" class="input-field" style="padding-left: 16px;"
+                                value="266">
+                        </div>
+                        <div style="flex: 1;">
+                            <label style="font-size: 13px; color: var(--text-gray);">Default Order Max (49900)</label>
+                            <input type="number" id="defaultOrderMax" class="input-field" style="padding-left: 16px;"
+                                value="49900">
+                        </div>
+                    </div>
+                    <div>
+                        <label style="font-size: 13px; color: var(--text-gray);">Order Display Count (Default
+                            20)</label>
+                        <input type="number" id="orderDisplayCount" class="input-field" style="padding-left: 16px;"
+                            value="20">
+                    </div>
+                    <div
+                        style="background: #F0F9FF; padding: 20px; border-radius: 12px; border: 1px solid #BAE6FD; margin-bottom: 5px;">
+                        <h3
+                            style="margin-bottom: 15px; font-size: 16px; color: var(--text-dark); border-bottom: 1px solid #BAE6FD; padding-bottom: 10px;">
+                            <i class="fa-solid fa-layer-group" style="margin-right: 8px;"></i> Order Category Settings
+                        </h3>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px;">
+                            <div>
+                                <h4 style="font-size: 14px; margin-bottom: 10px;">Small Range</h4>
+                                <label style="font-size: 11px; color: var(--text-gray);">Min</label>
+                                <input type="number" id="smallMin" class="input-field" value="250"
+                                    style="margin-bottom: 10px;">
+                                <label style="font-size: 11px; color: var(--text-gray);">Max</label>
+                                <input type="number" id="smallMax" class="input-field" value="1700">
+                            </div>
+                            <div>
+                                <h4 style="font-size: 14px; margin-bottom: 10px;">Medium Range</h4>
+                                <label style="font-size: 11px; color: var(--text-gray);">Min</label>
+                                <input type="number" id="mediumMin" class="input-field" value="2400"
+                                    style="margin-bottom: 10px;">
+                                <label style="font-size: 11px; color: var(--text-gray);">Max</label>
+                                <input type="number" id="mediumMax" class="input-field" value="10000">
+                            </div>
+                            <div>
+                                <h4 style="font-size: 14px; margin-bottom: 10px;">Large Range</h4>
+                                <label style="font-size: 11px; color: var(--text-gray);">Min</label>
+                                <input type="number" id="largeMin" class="input-field" value="10000"
+                                    style="margin-bottom: 10px;">
+                                <label style="font-size: 11px; color: var(--text-gray);">Max</label>
+                                <input type="number" id="largeMax" class="input-field" value="49000">
+                            </div>
+                        </div>
+                    </div>
+                    <div>
+                        <button type="button" id="resetOrdersBtn" class="btn-gradient"
+                            style="background: #EF4444; margin-bottom: 5px;">Reset/Refresh Orders Now</button>
+                        <p style="font-size: 11px; color: #64748B;">Forces all users to refresh their order list
+                            immediately.</p>
+                    </div>
+                    <div
+                        style="background: #F8FAFC; padding: 20px; border-radius: 12px; border: 1px solid #E2E8F0; margin-bottom: 5px;">
+                        <h3
+                            style="margin-bottom: 15px; font-size: 16px; color: var(--text-dark); border-bottom: 1px solid #E2E8F0; padding-bottom: 10px;">
+                            <i class="fa-solid fa-users" style="margin-right: 8px;"></i> Referral Settings
+                        </h3>
+                        <div style="margin-bottom: 15px;">
+                            <label style="font-size: 13px; color: var(--text-gray);">Referral Commission %</label>
+                            <input type="number" id="referralCommissionPercent" class="input-field" step="0.1"
+                                style="padding-left: 16px;" value="0.5">
+                            <p style="font-size: 11px; color: #64748B; margin-top: 4px;">Default: 0.5% - Commission
+                                given to referrer when invited user places an order</p>
+                        </div>
+                        <div>
+                            <label style="font-size: 13px; color: var(--text-gray);">Website Domain (for Invite
+                                Links)</label>
+                            <input type="text" id="websiteDomain" class="input-field" style="padding-left: 16px;"
+                                placeholder="https://xcoin.com">
+                            <p style="font-size: 11px; color: #64748B; margin-top: 4px;">Link will be:
+                                {domain}/signup.html?ref={code}</p>
+                        </div>
+                    </div>
+                    <div>
+                        <label style="font-size: 13px; color: var(--text-gray);">APK Download URL (leave blank for
+                            default)</label>
+                        <input type="text" id="apkUrl" class="input-field" style="padding-left: 16px;">
+                    </div>
+                    <div
+                        style="background: #F8FAFC; padding: 20px; border-radius: 12px; border: 1px solid #E2E8F0; margin-bottom: 25px;">
+                        <h3
+                            style="margin-bottom: 15px; font-size: 16px; color: var(--text-dark); border-bottom: 1px solid #E2E8F0; padding-bottom: 10px;">
+                            <i class="fa-solid fa-bell" style="margin-right: 8px;"></i> Scrolling Ticker (Notifications)
+                        </h3>
+                        <div>
+                            <label style="font-size: 13px; color: var(--text-gray);">Home Page Ticker — this scrolls at
+                                the top of the app <span style="color:#10B981;font-weight:700;">(admin
+                                    editable)</span></label>
+                            <textarea id="globalTicker" class="input-field" style="padding: 10px; height: 70px;"
+                                placeholder="🔔 Don't get tricked — stay safe! 💰 Trade xCoin safely with 999Pay 📈 Earn daily profits!"></textarea>
+                        </div>
+                        <div>
+                            <label style="font-size: 13px; color: var(--text-gray);">Purchase Page Ticker</label>
+                            <textarea id="purchaseTicker" class="input-field"
+                                style="padding: 10px; height: 60px;"></textarea>
+                        </div>
+                        <div>
+                            <label style="font-size: 13px; color: var(--text-gray);">Profile Page Ticker</label>
+                            <textarea id="profileTicker" class="input-field"
+                                style="padding: 10px; height: 60px;"></textarea>
+                        </div>
+                        <div>
+                            <label style="font-size: 13px; color: var(--text-gray);">Tool Page Ticker</label>
+                            <textarea id="toolTicker" class="input-field"
+                                style="padding: 10px; height: 60px;"></textarea>
+                        </div>
+                        <div>
+                            <label style="font-size: 13px; color: var(--text-gray);">Payment Page Ticker</label>
+                            <textarea id="paymentTicker" class="input-field"
+                                style="padding: 10px; height: 60px;"></textarea>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn-gradient">Save Settings</button>
+                </form>
+            </div>
+        </main>
+    </div>
+
+    <script type="module">
+        import { auth, db } from "./js/firebase.js";
+        import { doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+        import { initPopup, showPopup } from "./js/utils.js";
+
+        initPopup();
+
+        // Admin Session Check
+        if (localStorage.getItem('adminSession') !== 'active') {
+            window.location.href = "login.html";
+        }
+
+        const settingsForm = document.getElementById('settingsForm');
+        let initialUpi1 = "", initialUpi2 = "", initialUpi3 = "";
+
+        function formatTgLink(input) {
+            if (!input) return "";
+            input = input.trim();
+            if (input.startsWith('http://') || input.startsWith('https://')) {
+                return input;
+            }
+            // Remove @ if present
+            if (input.startsWith('@')) {
+                input = input.substring(1);
+            }
+            return `https://t.me/${input}`;
+        }
+
+        // Load current
+        async function load() {
+            const docSnap = await getDoc(doc(db, "settings", "app_settings"));
+            if (docSnap.exists()) {
+                const data = docSnap.data();
+                initialUpi1 = data.paymentUpi1 || data.paymentUpi || "";
+                initialUpi2 = data.paymentUpi2 || "";
+                initialUpi3 = data.paymentUpi3 || "";
+                
+                document.getElementById('usdtPrice').value = data.usdtPrice || "";
+                document.getElementById('marketPrice').value = data.marketPrice || "";
+                document.getElementById('paymentUpi1').value = initialUpi1;
+                document.getElementById('paymentUpi2').value = initialUpi2;
+                document.getElementById('paymentUpi3').value = initialUpi3;
+                document.getElementById('qrUrl1').value = data.qrUrl1 || data.qrUrl || "";
+                document.getElementById('qrUrl2').value = data.qrUrl2 || "";
+                document.getElementById('qrUrl3').value = data.qrUrl3 || "";
+                document.getElementById('rewardPercent').value = data.rewardPercent || "5.90";
+                document.getElementById('rewardPercentRupee').value = data.rewardPercentRupee || "3.50";
+                document.getElementById('statusDescription').value = data.statusDescription || "This is a demo status description.";
+                document.getElementById('toolWarning').value = data.toolWarning || "* After selecting the payment tool, please use the selected tool to make payment, otherwise the account will not be credited";
+                document.getElementById('tgSupport').value = data.tgSupport || "";
+                document.getElementById('tgGroup').value = data.tgGroup || "";
+                document.getElementById('welcomeBonus').value = data.welcomeBonus || 100;
+                document.getElementById('defaultOrderMin').value = data.defaultOrderMin || 266;
+                document.getElementById('defaultOrderMax').value = data.defaultOrderMax || 49900;
+                document.getElementById('orderDisplayCount').value = data.orderDisplayCount || 20;
+
+                // Load ranges
+                document.getElementById('smallMin').value = data.smallMin !== undefined ? data.smallMin : 250;
+                document.getElementById('smallMax').value = data.smallMax !== undefined ? data.smallMax : 1700;
+                document.getElementById('mediumMin').value = data.mediumMin !== undefined ? data.mediumMin : 2400;
+                document.getElementById('mediumMax').value = data.mediumMax !== undefined ? data.mediumMax : 10000;
+                document.getElementById('largeMin').value = data.largeMin !== undefined ? data.largeMin : 10000;
+                document.getElementById('largeMax').value = data.largeMax !== undefined ? data.largeMax : 49000;
+
+                document.getElementById('referralCommissionPercent').value = data.referralCommissionPercent !== undefined ? data.referralCommissionPercent : "0.5";
+                document.getElementById('websiteDomain').value = data.websiteDomain || data.baseInviteUrl || window.location.origin;
+
+                document.getElementById('apkUrl').value = data.apkUrl || "";
+                document.getElementById('globalTicker').value = data.tickerText || data.globalTicker || "";
+                document.getElementById('purchaseTicker').value = data.purchaseTicker || "";
+                document.getElementById('profileTicker').value = data.profileTicker || "";
+                document.getElementById('toolTicker').value = data.toolTicker || "";
+                document.getElementById('paymentTicker').value = data.paymentTicker || "";
+            }
+        }
+        load();
+
+        document.getElementById('resetOrdersBtn').addEventListener('click', async () => {
+            try {
+                await setDoc(doc(db, "settings", "app_settings"), {
+                    lastOrderRefresh: Date.now()
+                }, { merge: true });
+                showPopup("Order lists reset for all users!");
+            } catch (e) {
+                showPopup("Reset failed");
+            }
+        });
+
+        settingsForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const currentUpi1 = document.getElementById('paymentUpi1').value;
+            const currentUpi2 = document.getElementById('paymentUpi2').value;
+            const currentUpi3 = document.getElementById('paymentUpi3').value;
+
+            if (currentUpi1 !== initialUpi1 || currentUpi2 !== initialUpi2 || currentUpi3 !== initialUpi3) {
+                const pass = prompt("Enter password to save new UPI ID:");
+                if (pass !== "xxx") {
+                    showPopup("Incorrect password! Cannot save UPI ID.");
+                    return;
+                }
+            }
+
+            try {
+                await setDoc(doc(db, "settings", "app_settings"), {
+                    usdtPrice: parseFloat(document.getElementById('usdtPrice').value),
+                    marketPrice: parseFloat(document.getElementById('marketPrice').value),
+                    paymentUpi1: document.getElementById('paymentUpi1').value,
+                    paymentUpi2: document.getElementById('paymentUpi2').value,
+                    paymentUpi3: document.getElementById('paymentUpi3').value,
+                    qrUrl1: document.getElementById('qrUrl1').value,
+                    qrUrl2: document.getElementById('qrUrl2').value,
+                    qrUrl3: document.getElementById('qrUrl3').value,
+                    rewardPercent: parseFloat(document.getElementById('rewardPercent').value),
+                    rewardPercentRupee: parseFloat(document.getElementById('rewardPercentRupee').value),
+                    statusDescription: document.getElementById('statusDescription').value,
+                    toolWarning: document.getElementById('toolWarning').value,
+                    tgSupport: formatTgLink(document.getElementById('tgSupport').value),
+                    tgGroup: formatTgLink(document.getElementById('tgGroup').value),
+                    welcomeBonus: parseFloat(document.getElementById('welcomeBonus').value),
+                    defaultOrderMin: parseFloat(document.getElementById('defaultOrderMin').value),
+                    defaultOrderMax: parseFloat(document.getElementById('defaultOrderMax').value),
+                    orderDisplayCount: parseInt(document.getElementById('orderDisplayCount').value),
+                    // Save ranges
+                    smallMin: parseFloat(document.getElementById('smallMin').value),
+                    smallMax: parseFloat(document.getElementById('smallMax').value),
+                    mediumMin: parseFloat(document.getElementById('mediumMin').value),
+                    mediumMax: parseFloat(document.getElementById('mediumMax').value),
+                    largeMin: parseFloat(document.getElementById('largeMin').value),
+                    largeMax: parseFloat(document.getElementById('largeMax').value),
+
+                    referralCommissionPercent: parseFloat(document.getElementById('referralCommissionPercent').value),
+                    websiteDomain: document.getElementById('websiteDomain').value,
+                    baseInviteUrl: document.getElementById('websiteDomain').value, // Fallback for older code
+                    apkUrl: document.getElementById('apkUrl').value,
+                    tickerText: document.getElementById('globalTicker').value,  // used by home page
+                    globalTicker: document.getElementById('globalTicker').value,
+                    purchaseTicker: document.getElementById('purchaseTicker').value,
+                    profileTicker: document.getElementById('profileTicker').value,
+                    toolTicker: document.getElementById('toolTicker').value,
+                    paymentTicker: document.getElementById('paymentTicker').value,
+                    updatedAt: new Date()
+                }, { merge: true });
+                showPopup("Settings saved!");
+            } catch (error) {
+                showPopup(error.message);
+            }
+        });
+    </script>
+</body>
+
+</html>

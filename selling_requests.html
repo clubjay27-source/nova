@@ -1,0 +1,294 @@
+<!-- admin/selling_requests.html -->
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Selling Requests - Admin</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        body {
+            max-width: 100%;
+            margin: 0;
+            background: #F8FAFC;
+        }
+
+        .admin-layout {
+            display: grid;
+            grid-template-columns: 250px 1fr;
+            min-height: 100vh;
+        }
+
+        .sidebar {
+            background: white;
+            padding: 20px;
+            border-right: 1px solid #E2E8F0;
+        }
+
+        .sidebar-menu {
+            list-style: none;
+            margin-top: 30px;
+        }
+
+        .sidebar-menu a {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            text-decoration: none;
+            color: var(--text-gray);
+            border-radius: 8px;
+        }
+
+        .sidebar-menu a.active {
+            background: var(--primary);
+            color: white;
+        }
+
+        .content {
+            padding: 40px;
+        }
+
+        .request-card {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            border: 1px solid #E2E8F0;
+        }
+
+        .btn-approve {
+            background: #10B981;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        .btn-reject {
+            background: #EF4444;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        .installment-progress {
+            height: 8px;
+            background: #E2E8F0;
+            border-radius: 4px;
+            margin-top: 10px;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: #6C3EF4;
+            width: 0%;
+            transition: width 0.5s;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="admin-layout">
+        <aside class="sidebar">
+            <ul class="sidebar-menu">
+                <li><a href="index.html"><i class="fa-solid fa-chart-line"></i> Dashboard</a></li>
+                <li><a href="orders.html"><i class="fa-solid fa-list"></i> INR Orders</a></li>
+                <li><a href="payments.html"><i class="fa-solid fa-receipt"></i> Payment Approvals</a></li>
+                <li><a href="selling_requests.html" class="active"><i class="fa-solid fa-hand-holding-dollar"></i>
+                        Selling Requests</a></li>
+                <li><a href="users.html"><i class="fa-solid fa-users"></i> Users Management</a></li>
+                <li><a href="gift_codes.html"><i class="fa-solid fa-gift"></i> Gift Codes</a></li>
+                <li><a href="banner.html"><i class="fa-solid fa-image"></i> Banners</a></li>
+                <li><a href="tutorial.html"><i class="fa-solid fa-graduation-cap"></i> Tutorials</a></li>
+                <li><a href="popups.html"><i class="fa-solid fa-window-maximize"></i> App Popups</a></li>
+                <li><a href="settings.html"><i class="fa-solid fa-gear"></i> App Settings</a></li>
+                <li><a href="../index.html" style="color: var(--danger); margin-top: 20px;"><i
+                            class="fa-solid fa-arrow-left"></i> Exit Admin</a></li>
+            </ul>
+        </aside>
+
+        <main class="content">
+            <h1>Selling Requests</h1>
+            <div id="requestsList" style="margin-top: 30px;">
+                <!-- Requests will appear here -->
+            </div>
+        </main>
+    </div>
+
+    <script type="module">
+        import { auth, db } from "./js/firebase.js";
+        import { collection, onSnapshot, query, where, doc, updateDoc, increment, getDoc, addDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+        import { initPopup, showPopup } from "./js/utils.js";
+
+        initPopup();
+
+        // Admin Session Check
+        if (localStorage.getItem('adminSession') !== 'active') {
+            window.location.href = "login.html";
+        }
+
+        onSnapshot(query(collection(db, "selling_requests"), where("status", "==", "pending")), (sn) => {
+            const list = document.getElementById('requestsList');
+            list.innerHTML = '';
+
+            // Group requests by UID
+            const groups = {};
+            sn.forEach(docSnap => {
+                const data = { id: docSnap.id, ...docSnap.data() };
+                if (!groups[data.uid]) {
+                    groups[data.uid] = {
+                        uid: data.uid,
+                        name: data.name,
+                        userId: data.userId || '...',
+                        requests: [],
+                        totalAmount: 0
+                    };
+                }
+                groups[data.uid].requests.push(data);
+                groups[data.uid].totalAmount += Number(data.sellAmount);
+            });
+
+            Object.values(groups).forEach(group => {
+                const card = document.createElement('div');
+                card.className = 'request-card';
+                card.innerHTML = `
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <div>
+                            <h3 style="margin: 0;"><span id="uName_${group.uid}">${group.name}</span> (ID: <span id="uId_${group.uid}">${group.userId}</span>)</h3>
+                            <p style="color: #64748B; font-size: 14px;">Total Pending Requests: <b>${group.requests.length}</b></p>
+                            <p style="font-weight: 700; color: #6C3EF4;">Total Amount: ₹${group.totalAmount.toFixed(2)}</p>
+                            <div style="margin-top: 10px; font-size: 13px; color: #64748B; background: #F8FAFC; padding: 10px; border-radius: 8px;">
+                                ${group.requests.map(r => `• ${r.platform}: <b>₹${Number(r.sellAmount).toFixed(2)}</b>`).join('<br>')}
+                            </div>
+                        </div>
+                        <div style="display: flex; gap: 10px;">
+                            <button class="btn-approve approve-btn" data-uid="${group.uid}">Approve All</button>
+                            <button class="btn-reject reject-btn" data-uid="${group.uid}">Reject All</button>
+                        </div>
+                    </div>
+                `;
+                list.appendChild(card);
+
+                // Fetch numeric User ID and latest user name
+                getDoc(doc(db, "users", group.uid)).then(uSnap => {
+                    if (uSnap.exists()) {
+                        const uData = uSnap.data();
+                        if (uData.userId) {
+                            const idEl = document.getElementById(`uId_${group.uid}`);
+                            if (idEl) idEl.textContent = uData.userId;
+                        }
+                        if (uData.name) {
+                            const nameEl = document.getElementById(`uName_${group.uid}`);
+                            if (nameEl) nameEl.textContent = uData.name;
+                        }
+                    }
+                });
+
+                card.querySelector('.approve-btn').onclick = () => approveBatch(group);
+                card.querySelector('.reject-btn').onclick = () => rejectBatch(group);
+            });
+        });
+
+        async function approveBatch(group) {
+            if (!confirm(`Approve all ${group.requests.length} requests for ${group.name} totaling ₹${group.totalAmount}?`)) return;
+
+            try {
+                const userRef = doc(db, "users", group.uid);
+                const userSnap = await getDoc(userRef);
+                if (!userSnap.exists()) throw new Error("User not found");
+
+                const currentDiamonds = userSnap.data().diamonds || 0;
+                let newBalance = currentDiamonds - group.totalAmount;
+                if (newBalance < 0) newBalance = 0;
+
+                // 1. Update User Balance (Atomic)
+                await updateDoc(userRef, {
+                    diamonds: newBalance,
+                    "stats.todaySellAmount": increment(group.totalAmount),
+                    "stats.totalSellAmount": increment(group.totalAmount)
+                });
+
+                // 2. Process each individual request to update status
+                for (const req of group.requests) {
+                    await updateDoc(doc(db, "selling_requests", req.id), { status: 'success' });
+                    await updateDoc(doc(db, "users", group.uid, "payment", req.docId), {
+                        isSelling: true,
+                        sellingStatus: 'active',
+                        status: 'online'
+                    });
+                }
+
+                // 3. Add only a single consolidated entry to the user's sell_history using the primary (top) UPI
+                const primaryReq = group.requests[0];
+                await addDoc(collection(db, "users", group.uid, "sell_history"), {
+                    amount: group.totalAmount,
+                    platform: primaryReq.platform,
+                    upiId: primaryReq.upiId,
+                    status: 'success',
+                    timestamp: Date.now(),
+                    date: new Date().toISOString().split("T")[0]
+                });
+
+                // 3. Send Summary Message
+                await addDoc(collection(db, "users", group.uid, "inbox"), {
+                    title: "Selling Requests Approved",
+                    message: `All your pending selling requests (${group.requests.length} accounts) totaling ₹${group.totalAmount} have been completed.`,
+                    status: 'unread',
+                    timestamp: Date.now()
+                });
+
+                showPopup("Batch Approval Complete!");
+            } catch (err) {
+                showPopup("Error: " + err.message);
+            }
+        }
+
+        async function rejectBatch(group) {
+            const reason = prompt(`Enter rejection reason for all ${group.requests.length} requests:`);
+            if (reason === null) return;
+
+            try {
+                for (const req of group.requests) {
+                    await updateDoc(doc(db, "selling_requests", req.id), { status: 'rejected', reason: reason });
+                    await updateDoc(doc(db, "users", group.uid, "payment", req.docId), {
+                        isSelling: false,
+                        sellingStatus: 'off'
+                    });
+                }
+
+                const primaryReq = group.requests[0];
+                await addDoc(collection(db, "users", group.uid, "sell_history"), {
+                    amount: group.totalAmount,
+                    platform: primaryReq.platform,
+                    upiId: primaryReq.upiId,
+                    status: 'rejected',
+                    reason: reason,
+                    timestamp: Date.now()
+                });
+
+                await addDoc(collection(db, "users", group.uid, "inbox"), {
+                    title: "Selling Requests Rejected",
+                    message: `Your ${group.requests.length} selling requests were rejected. Reason: ${reason || "User request rejected by admin."}`,
+                    status: 'unread',
+                    timestamp: Date.now()
+                });
+
+                showPopup("Batch Rejection Complete!");
+            } catch (e) {
+                showPopup("Error: " + e.message);
+            }
+        }
+
+    </script>
+</body>
+
+</html>

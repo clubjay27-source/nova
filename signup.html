@@ -1,0 +1,116 @@
+<!-- signup.html -->
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Signup - XQ PAY</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/login.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#6C3EF4">
+</head>
+
+<body>
+    <div class="auth-container">
+        <div class="auth-header">
+            <div class="xq-logo">
+                <svg viewBox="0 0 100 100" class="logo-svg">
+                    <defs>
+                        <linearGradient id="logoGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" style="stop-color:#22c55e;stop-opacity:1" />
+                            <stop offset="100%" style="stop-color:#15803d;stop-opacity:1" />
+                        </linearGradient>
+                    </defs>
+                    <rect x="10" y="10" width="80" height="80" rx="20" fill="url(#logoGrad)" />
+                    <text x="50" y="55" font-family="'Outfit', sans-serif" font-size="30" font-weight="800" fill="white"
+                        text-anchor="middle" dominant-baseline="middle">XQ</text>
+                    <path d="M70 70 L80 80 M75 65 L80 80 L65 75" stroke="white" stroke-width="4" stroke-linecap="round"
+                        fill="none" />
+                </svg>
+            </div>
+            <h1>XQ PAY</h1>
+        </div>
+
+        <div class="auth-card">
+            <form id="signupForm">
+                <div class="input-group">
+                    <div class="input-container">
+                        <i class="fa-solid fa-user"></i>
+                        <input type="text" id="name" class="input-field" placeholder="Full Name" required>
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <div class="input-container">
+                        <i class="fa-solid fa-mobile-screen-button"></i>
+                        <span class="phone-prefix">+91</span>
+                        <input type="tel" id="mobile" class="input-field" placeholder="Phone Number" required
+                            oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0, 10)" pattern="[0-9]{10}">
+                    </div>
+                    <span class="input-hint">Please enter 10 digit phone number</span>
+                </div>
+
+                <div class="input-group">
+                    <div class="input-container">
+                        <i class="fa-solid fa-lock"></i>
+                        <input type="password" id="password" class="input-field" placeholder="Password" required>
+                        <i class="fa-regular fa-eye-slash toggle-password" id="togglePassword"></i>
+                    </div>
+                    <span class="input-hint">Please enter 6 - 20 characters</span>
+                </div>
+
+                <div class="input-group">
+                    <div class="input-container">
+                        <i class="fa-solid fa-lock"></i>
+                        <input type="password" id="repassword" class="input-field" placeholder="Confirm Password"
+                            required>
+                    </div>
+                </div>
+
+                <div class="input-group referral-group">
+                    <div class="input-container">
+                        <i class="fa-solid fa-envelope-open-text"></i>
+                        <input type="text" id="referCode" class="input-field" placeholder="Referral Code">
+                    </div>
+                </div>
+
+                <button type="submit" class="btn-gradient">PRWESH</button>
+            </form>
+        </div>
+
+        <div class="auth-footer">
+            <p>Already have an account? <a href="login.html">Sign in</a></p>
+        </div>
+
+        <!-- Perks section as seen in screenshot -->
+        <div class="signup-perks">
+            <div class="perk-item">
+                <img src="https://cdn-icons-png.flaticon.com/128/3580/3580148.png" class="perk-icon" alt="Link">
+                <span>Copy the unique link</span>
+            </div>
+            <div class="perk-item">
+                <img src="https://cdn-icons-png.flaticon.com/128/929/929468.png" class="perk-icon" alt="Share">
+                <span>Share with your friends</span>
+            </div>
+            <div class="perk-item">
+                <img src="https://cdn-icons-png.flaticon.com/128/7542/7542190.png" class="perk-icon" alt="User">
+                <span>Successfully registered</span>
+            </div>
+            <div class="perk-item">
+                <img src="https://cdn-icons-png.flaticon.com/128/3135/3135706.png" class="perk-icon" alt="Rewards">
+                <span>Get Rewards</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="loader-overlay" id="loader">
+        <div class="spinner"></div>
+    </div>
+
+    <script type="module" src="js/auth.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,208 @@
+<!-- admin/gift_codes.html -->
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gift Codes - Admin</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        body {
+            max-width: 100%;
+            margin: 0;
+            background: #F8FAFC;
+        }
+
+        .admin-layout {
+            display: grid;
+            grid-template-columns: 250px 1fr;
+            min-height: 100vh;
+        }
+
+        .sidebar {
+            background: white;
+            padding: 20px;
+            border-right: 1px solid #E2E8F0;
+        }
+
+        .sidebar-menu {
+            list-style: none;
+            margin-top: 30px;
+        }
+
+        .sidebar-menu a {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            text-decoration: none;
+            color: var(--text-gray);
+            border-radius: 8px;
+        }
+
+        .sidebar-menu a.active {
+            background: var(--primary);
+            color: white;
+        }
+
+        .content {
+            padding: 40px;
+        }
+
+        .card {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            border: 1px solid #E2E8F0;
+        }
+
+        .input-field {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #E2E8F0;
+            border-radius: 8px;
+            margin-top: 5px;
+            margin-bottom: 15px;
+        }
+
+        label {
+            font-size: 13px;
+            color: #64748B;
+            font-weight: 600;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="admin-layout">
+        <aside class="sidebar">
+            <ul class="sidebar-menu">
+                <li><a href="index.html"><i class="fa-solid fa-chart-line"></i> Dashboard</a></li>
+                <li><a href="orders.html"><i class="fa-solid fa-list"></i> INR Orders</a></li>
+                <li><a href="payments.html"><i class="fa-solid fa-receipt"></i> Payment Approvals</a></li>
+                <li><a href="selling_requests.html"><i class="fa-solid fa-hand-holding-dollar"></i> Selling Requests</a>
+                </li>
+                <li><a href="users.html"><i class="fa-solid fa-users"></i> Users Management</a></li>
+                <li><a href="gift_codes.html" class="active"><i class="fa-solid fa-gift"></i> Gift Codes</a></li>
+                <li><a href="banner.html"><i class="fa-solid fa-image"></i> Banners</a></li>
+                <li><a href="tutorial.html"><i class="fa-solid fa-graduation-cap"></i> Tutorials</a></li>
+                <li><a href="popups.html"><i class="fa-solid fa-window-maximize"></i> App Popups</a></li>
+                <li><a href="settings.html"><i class="fa-solid fa-gear"></i> App Settings</a></li>
+                <li><a href="../index.html" style="color: var(--danger); margin-top: 20px;"><i
+                            class="fa-solid fa-arrow-left"></i> Exit Admin</a></li>
+            </ul>
+        </aside>
+
+        <main class="content">
+            <h1>Create Gift Code</h1>
+
+            <div class="card" style="max-width: 500px;">
+                <label>Gift Code (e.g. WELCOME50, leave blank for random)</label>
+                <input type="text" id="giftCodeInput" class="input-field" placeholder="GIFTCODE"
+                    style="text-transform: uppercase;">
+
+                <label>Diamond Amount</label>
+                <input type="number" id="giftAmount" class="input-field" placeholder="Amount">
+
+                <label>Specific User ID (Optional, leave blank for All Users)</label>
+                <input type="text" id="specificUser" class="input-field" placeholder="Enter User ID (Optional)">
+
+                <label>Expiry Date (Optional)</label>
+                <input type="datetime-local" id="expiryDate" class="input-field">
+
+                <button class="btn-gradient" id="createGiftBtn" style="width: 100%; margin-top: 10px;">Generate Gift
+                    Code</button>
+            </div>
+
+            <h2 style="margin-top: 40px;">Active Gift Codes</h2>
+            <div id="giftCodeList"
+                style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 15px; margin-top: 15px;">
+                <!-- List of generated codes will load here -->
+            </div>
+        </main>
+    </div>
+
+    <script type="module">
+        import { auth, db } from "./js/firebase.js";
+        import { collection, doc, setDoc, onSnapshot, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        import { initPopup, showPopup } from "./js/utils.js";
+
+        initPopup();
+
+        if (localStorage.getItem('adminSession') !== 'active') {
+            window.location.href = "login.html";
+        }
+
+        document.getElementById('createGiftBtn').onclick = async () => {
+            let code = document.getElementById('giftCodeInput').value.trim().toUpperCase();
+            if (!code) {
+                code = Math.random().toString(36).substring(2, 10).toUpperCase();
+            }
+
+            const amount = parseFloat(document.getElementById('giftAmount').value);
+            if (isNaN(amount) || amount <= 0) return showPopup("Enter a valid amount");
+
+            const specificUser = document.getElementById('specificUser').value.trim();
+            const expiry = document.getElementById('expiryDate').value;
+
+            try {
+                await setDoc(doc(db, "gift_codes", code), {
+                    code: code,
+                    amount: amount,
+                    specificUserId: specificUser || null,
+                    expiryDate: expiry || null,
+                    createdAt: Date.now(),
+                    status: 'active',
+                    claimedBy: []
+                });
+                showPopup("Gift Code Created: " + code);
+                document.getElementById('giftCodeInput').value = '';
+                document.getElementById('giftAmount').value = '';
+                document.getElementById('specificUser').value = '';
+                document.getElementById('expiryDate').value = '';
+            } catch (e) {
+                showPopup("Error: " + e.message);
+            }
+        };
+
+        // Load active codes
+        onSnapshot(collection(db, "gift_codes"), (snap) => {
+            const list = document.getElementById('giftCodeList');
+            list.innerHTML = '';
+            snap.forEach(d => {
+                const data = d.data();
+                if (data.status !== 'active') return;
+
+                const card = document.createElement('div');
+                card.className = 'card';
+                card.style.marginBottom = '0';
+                card.innerHTML = `
+                    <h3 style="margin: 0; color: #EC4899;">${data.code}</h3>
+                    <p style="margin: 5px 0;">Amount: <b>₹${data.amount}</b></p>
+                    <p style="margin: 5px 0; font-size: 13px; color: #64748B;">For: ${data.specificUserId ? "User " + data.specificUserId : "All Users"}</p>
+                    <p style="margin: 5px 0 15px; font-size: 13px; color: #64748B;">Expiry: ${data.expiryDate ? new Date(data.expiryDate).toLocaleString() : "No Expiry"}</p>
+                    <div style="display: flex; gap: 10px;">
+                        <button class="btn-gradient del-btn" data-id="${data.code}" style="background: #EF4444; padding: 5px; font-size: 12px; border-radius: 4px;">Delete</button>
+                    </div>
+                `;
+                list.appendChild(card);
+            });
+
+            document.querySelectorAll('.del-btn').forEach(btn => {
+                btn.onclick = async (e) => {
+                    const id = e.target.getAttribute('data-id');
+                    if (confirm("Delete this gift code?")) {
+                        await deleteDoc(doc(db, "gift_codes", id));
+                        showPopup("Deleted!");
+                    }
+                };
+            });
+        });
+    </script>
+</body>
+
+</html>

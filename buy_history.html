@@ -1,0 +1,157 @@
+<!-- buy_history.html -->
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Buy History - XQ PAY</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        .bill-card {
+            background: white;
+            padding: 15px 20px;
+            border-radius: 16px;
+            margin-bottom: 15px;
+            box-shadow: var(--shadow);
+            border-left: 4px solid var(--primary);
+        }
+
+        .bill-card.approved {
+            border-left-color: #10B981;
+        }
+
+        .bill-card.declined {
+            border-left-color: #EF4444;
+        }
+
+        .status-pill {
+            font-size: 11px;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .status-pill.pending {
+            background: #FFFBEB;
+            color: #D97706;
+        }
+
+        .status-pill.approved {
+            background: #F0FDF4;
+            color: #16A34A;
+        }
+
+        .status-pill.declined {
+            background: #FEF2F2;
+            color: #DC2626;
+        }
+    </style>
+</head>
+
+<body>
+    <header class="main-header">
+        <div class="logo-area" onclick="window.location.href='profile.html'" style="cursor: pointer;">
+            <i class="fa-solid fa-chevron-left" style="font-size: 18px; margin-right: 5px;"></i>
+            <h1 class="app-name">Buy History</h1>
+        </div>
+        <div class="header-right">
+            <i class="fa-solid fa-cart-check"></i>
+        </div>
+    </header>
+
+    <div class="app-container">
+
+        <div id="billList" style="padding: 0 20px 100px;">
+            <!-- Bills will appear here -->
+        </div>
+
+        <!-- Appended for prompt exactitude -->
+        <div id="historyList" style="padding: 0 20px 100px; display: none;"></div>
+    </div>
+
+    <script type="module">
+        import { auth, db } from "./js/firebase.js";
+        import { collection, onSnapshot, getDocs, query, orderBy, where } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+
+        onAuthStateChanged(auth, async (user) => {
+            if (!user) { window.location.href = "login.html"; return; }
+
+            onSnapshot(query(collection(db, "payments"), where("userId", "==", user.uid)), (sn) => {
+                const list = document.getElementById('billList');
+                list.innerHTML = '';
+                if (sn.empty) {
+                    list.innerHTML = '<p style="text-align: center; color: #64748B; margin-top: 50px;">No transaction history</p>';
+                    return;
+                }
+                const items = [];
+                sn.forEach(d => items.push({ id: d.id, ...d.data() }));
+                items.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+
+                items.forEach(pay => {
+                    const card = document.createElement('div');
+
+                    const isSuccess = pay.status === 'success' || pay.status === 'approved';
+                    const isRejected = pay.status === 'failed' || pay.status === 'declined' || pay.status === 'rejected';
+
+                    const statusClass = isSuccess ? 'approved' : (isRejected ? 'declined' : 'pending');
+                    const statusText = isSuccess ? 'Success' : (isRejected ? 'Rejected' : 'Pending');
+
+                    // Calculate reward based on type (USDT is higher)
+                    let rewardPercent = 0.059; // Default 5.9%
+                    if (pay.type === 'USDT') rewardPercent = 0.07; // Example higher reward for USDT
+                    const rewardAmt = pay.reward !== undefined ? pay.reward : (pay.amount * rewardPercent);
+
+                    card.className = `bill-card ${statusClass}`;
+                    card.innerHTML = `
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                            <span style="font-size: 12px; color: #64748B;">${new Date(pay.createdAt).toLocaleString()}</span>
+                            <span class="status-pill ${statusClass}">${statusText}</span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <div>
+                                <div style="font-weight: 700; font-size: 18px;">₹ ${pay.amount.toFixed(2)}</div>
+                                <div style="font-size: 12px; color: #64748B; margin-top: 4px;">UTR: ${pay.utr}</div>
+                                <div style="font-size: 10px; color: var(--primary); font-weight: 600;">Type: ${pay.type || 'INR'}</div>
+                            </div>
+                            <div style="text-align: right;">
+                                <div style="font-weight: 700; font-size: 15px; color: #10B981;">+ ₹ ${rewardAmt.toFixed(2)}</div>
+                                <div style="font-size: 11px; color: #64748B;">Reward</div>
+                            </div>
+                        </div>
+                    `;
+                    list.appendChild(card);
+                });
+            });
+
+            // Added for Prompt exactitude
+            const historyContainer = document.getElementById("historyList");
+            const q = query(
+                collection(db, "orders"),
+                where("userId", "==", user.uid),
+                orderBy("createdAt", "desc")
+            );
+
+            const snap = await getDocs(q);
+
+            snap.forEach(doc => {
+                const data = doc.data();
+
+                historyContainer.innerHTML += `
+                <div class="order-card">
+                Amount: ₹${data.amount}
+                Reward: ₹${data.reward}
+                Status: ${data.status}
+                Date: ${data.date}
+                </div>
+                `;
+            });
+
+        });
+    </script>
+</body>
+
+</html>

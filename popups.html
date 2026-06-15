@@ -1,0 +1,199 @@
+<!-- admin/popups.html -->
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>App Popups - Admin</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        body {
+            max-width: 100%;
+            margin: 0;
+            background: linear-gradient(135deg, #BAE6FD 0%, #E0F2FE 100%);
+            min-height: 100vh;
+        }
+
+        .admin-layout {
+            display: grid;
+            grid-template-columns: 240px 1fr;
+            min-height: 100vh;
+            width: 100%;
+        }
+
+        .sidebar {
+            background: white;
+            padding: 20px;
+            border-right: 1px solid #E2E8F0;
+        }
+
+        .sidebar-menu {
+            list-style: none;
+            margin-top: 30px;
+        }
+
+        .sidebar-menu a {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            text-decoration: none;
+            color: var(--text-gray);
+            border-radius: 8px;
+        }
+
+        .sidebar-menu a.active {
+            background: var(--primary);
+            color: white;
+        }
+
+        .content {
+            padding: 40px;
+        }
+
+        .form-card {
+            background: white;
+            padding: 24px;
+            border-radius: 16px;
+            max-width: 600px;
+            margin-bottom: 30px;
+        }
+
+        .popup-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 20px;
+        }
+
+        .popup-card-preview {
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            position: relative;
+        }
+
+        .popup-card-preview img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+        }
+
+        .delete-btn-overlay {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: rgba(239, 68, 68, 0.9);
+            color: white;
+            border: none;
+            padding: 8px;
+            border-radius: 50%;
+            cursor: pointer;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="admin-layout">
+        <aside class="sidebar">
+            <ul class="sidebar-menu">
+                <li><a href="index.html"><i class="fa-solid fa-chart-line"></i> Dashboard</a></li>
+                <li><a href="orders.html"><i class="fa-solid fa-list"></i> INR Orders</a></li>
+                <li><a href="payments.html"><i class="fa-solid fa-receipt"></i> Payment Approvals</a></li>
+                <li><a href="selling_requests.html"><i class="fa-solid fa-hand-holding-dollar"></i> Selling Requests</a>
+                </li>
+                <li><a href="users.html"><i class="fa-solid fa-users"></i> Users Management</a></li>
+                <li><a href="gift_codes.html"><i class="fa-solid fa-gift"></i> Gift Codes</a></li>
+                <li><a href="banner.html"><i class="fa-solid fa-image"></i> Banners</a></li>
+                <li><a href="tutorial.html"><i class="fa-solid fa-graduation-cap"></i> Tutorials</a></li>
+                <li><a href="popups.html" class="active"><i class="fa-solid fa-window-maximize"></i> App Popups</a></li>
+                <li><a href="settings.html"><i class="fa-solid fa-gear"></i> App Settings</a></li>
+                <li><a href="../index.html" style="color: var(--danger); margin-top: 20px;"><i
+                            class="fa-solid fa-arrow-left"></i> Exit Admin</a></li>
+            </ul>
+        </aside>
+
+        <main class="content">
+            <h1>Manage App Popups</h1>
+
+            <div class="form-card" style="margin-top: 20px;">
+                <h3>Add New Popup</h3>
+                <form id="popupForm" style="display: flex; flex-direction: column; gap: 16px; margin-top: 16px;">
+                    <input type="text" id="popupImageUrl" class="input-field" placeholder="Image URL (Direct link)"
+                        required>
+                    <input type="text" id="popupLink" class="input-field" placeholder="Target URL (Optional)">
+                    <input type="number" id="popupOrder" class="input-field" placeholder="Display Order (e.g. 1)"
+                        value="1">
+                    <button type="submit" class="btn-gradient">Add Popup</button>
+                </form>
+            </div>
+
+            <div class="popup-list" id="popupList">
+                <!-- Popups will load here -->
+            </div>
+        </main>
+    </div>
+
+    <script type="module">
+        import { auth, db } from "./js/firebase.js";
+        import { collection, addDoc, onSnapshot, doc, deleteDoc, query, orderBy } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+        import { initPopup, showPopup } from "./js/utils.js";
+
+        initPopup();
+
+        // Admin Session Check
+        if (localStorage.getItem('adminSession') !== 'active') {
+            window.location.href = "login.html";
+        }
+
+        const popupForm = document.getElementById('popupForm');
+        const popupList = document.getElementById('popupList');
+
+        popupForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const image = document.getElementById('popupImageUrl').value;
+            const url = document.getElementById('popupLink').value;
+            const order = document.getElementById('popupOrder').value;
+
+            try {
+                await addDoc(collection(db, "popups"), {
+                    image,
+                    url,
+                    order: Number(order),
+                    createdAt: Date.now()
+                });
+                showPopup("Popup added!");
+                popupForm.reset();
+            } catch (error) { showPopup(error.message); }
+        });
+
+        onSnapshot(query(collection(db, "popups"), orderBy("order", "asc")), (snapshot) => {
+            popupList.innerHTML = '';
+            snapshot.forEach(docSnap => {
+                const p = docSnap.data();
+                const card = document.createElement('div');
+                card.className = 'popup-card-preview';
+                card.innerHTML = `
+                    <img src="${p.image}">
+                    <div style="padding: 10px;">
+                        <p style="font-size: 12px; color: var(--text-gray); margin: 0;">Order: ${p.order}</p>
+                        <p style="font-size: 11px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${p.url || 'No link'}</p>
+                    </div>
+                    <button class="delete-btn-overlay" onclick="deletePopup('${docSnap.id}')"><i class="fa-solid fa-trash"></i></button>
+                `;
+                popupList.appendChild(card);
+            });
+        });
+
+        window.deletePopup = async (id) => {
+            if (confirm("Delete this popup?")) {
+                await deleteDoc(doc(db, "popups", id));
+            }
+        };
+    </script>
+</body>
+
+</html>

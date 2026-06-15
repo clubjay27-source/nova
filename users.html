@@ -1,0 +1,1013 @@
+<!-- admin/users.html -->
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Users Management - Admin</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        body {
+            max-width: 100%;
+            margin: 0;
+            background: linear-gradient(135deg, #BAE6FD 0%, #E0F2FE 100%);
+            min-height: 100vh;
+        }
+
+        .admin-layout {
+            display: grid;
+            grid-template-columns: 240px 1fr;
+            min-height: 100vh;
+            width: 100%;
+        }
+
+        .sidebar {
+            background: white;
+            padding: 20px;
+            border-right: 1px solid #E2E8F0;
+        }
+
+        .sidebar-menu {
+            list-style: none;
+            margin-top: 30px;
+        }
+
+        .sidebar-menu a {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            text-decoration: none;
+            color: var(--text-gray);
+            border-radius: 8px;
+        }
+
+        .sidebar-menu a.active {
+            background: var(--primary);
+            color: white;
+        }
+
+        .content {
+            padding: 40px;
+        }
+
+        @media (max-width: 768px) {
+            .admin-layout {
+                grid-template-columns: 1fr;
+            }
+
+            .sidebar {
+                display: none;
+                /* Hide sidebar on mobile for better view */
+            }
+
+            .content {
+                padding: 15px;
+                /* Less padding on mobile */
+            }
+
+            h1 {
+                font-size: 20px;
+                margin-bottom: 20px;
+            }
+        }
+
+        .search-box {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+        }
+
+        @media (max-width: 768px) {
+            .search-box {
+                flex-direction: column;
+            }
+
+            .search-box button {
+                width: 100% !important;
+            }
+        }
+
+        .user-card {
+            background: white;
+            padding: 24px;
+            border-radius: 16px;
+            border: 1px solid #E2E8F0;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+        }
+
+        .action-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .action-box {
+            padding: 15px;
+            border: 1px solid #E2E8F0;
+            border-radius: 12px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="admin-layout">
+        <aside class="sidebar">
+            <ul class="sidebar-menu">
+                <li><a href="index.html"><i class="fa-solid fa-chart-line"></i> Dashboard</a></li>
+                <li><a href="orders.html"><i class="fa-solid fa-list"></i> INR Orders</a></li>
+                <li><a href="payments.html"><i class="fa-solid fa-receipt"></i> Payment Approvals</a></li>
+                <li><a href="selling_requests.html"><i class="fa-solid fa-hand-holding-dollar"></i> Selling Requests</a>
+                </li>
+                <li><a href="users.html" class="active"><i class="fa-solid fa-users"></i> Users Management</a></li>
+                <li><a href="gift_codes.html"><i class="fa-solid fa-gift"></i> Gift Codes</a></li>
+                <li><a href="banner.html"><i class="fa-solid fa-image"></i> Banners</a></li>
+                <li><a href="tutorial.html"><i class="fa-solid fa-graduation-cap"></i> Tutorials</a></li>
+                <li><a href="popups.html"><i class="fa-solid fa-window-maximize"></i> App Popups</a></li>
+                <li><a href="settings.html"><i class="fa-solid fa-gear"></i> App Settings</a></li>
+                <li><a href="../index.html" style="color: var(--danger); margin-top: 20px;"><i
+                            class="fa-solid fa-arrow-left"></i> Exit Admin</a></li>
+            </ul>
+        </aside>
+
+        <main class="content">
+            <h1>Users Management</h1>
+            <div class="search-box">
+                <input type="text" id="searchInput" class="input-field" placeholder="Search by User ID or Email">
+                <button class="btn-gradient" id="searchBtn" style="width: 120px;">Search</button>
+                <button class="btn-gradient" id="openAddUserBtn" style="width: 140px; background: #6C3EF4;">+ Add
+                    User</button>
+            </div>
+
+            <!-- Add User Modal -->
+            <div id="addUserModal"
+                style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; align-items: center; justify-content: center;">
+                <div style="background: white; padding: 24px; border-radius: 16px; width: 350px;">
+                    <h3 style="margin-top: 0;">Add New User</h3>
+                    <input type="text" id="addUserName" class="input-field" placeholder="Full Name (optional)"
+                        style="margin-bottom: 12px; padding-left: 16px;">
+                    <input type="text" id="addUserMobile" class="input-field" placeholder="Mobile Number"
+                        style="margin-bottom: 12px; padding-left: 16px;">
+                    <input type="text" id="addUserPass" class="input-field" placeholder="Password"
+                        style="margin-bottom: 20px; padding-left: 16px;">
+                    <div style="display: flex; gap: 10px;">
+                        <button class="btn-gradient" id="closeAddUserBtn"
+                            style="background: #64748B; flex: 1;">Cancel</button>
+                        <button class="btn-gradient" id="submitAddUserBtn" style="flex: 1;">Create User</button>
+                    </div>
+                </div>
+            </div>
+
+            <div id="userDetails" style="display: none; margin-bottom: 40px;">
+                <div class="user-card">
+                    <div style="border-bottom: 1px solid #E2E8F0; padding-bottom: 20px; margin-bottom: 20px;">
+                        <h2 id="uName" style="margin-bottom: 15px; color: var(--primary);">Loading...</h2>
+                        <div style="display: flex; flex-direction: column; gap: 8px; font-size: 14px;">
+                            <div
+                                style="display: flex; justify-content: space-between; padding: 4px 0; border-bottom: 1px dashed #F1F5F9;">
+                                <span style="color: #64748B;">User Unique ID:</span>
+                                <span id="uId" style="font-weight: 700; color: #1E293B;">--</span>
+                            </div>
+                            <div
+                                style="display: flex; justify-content: space-between; padding: 4px 0; border-bottom: 1px dashed #F1F5F9;">
+                                <span style="color: #64748B;">Login Email/Mobile:</span>
+                                <span id="uEmail" style="font-weight: 700; color: #1E293B;">--</span>
+                            </div>
+                            <div
+                                style="display: flex; justify-content: space-between; padding: 4px 0; border-bottom: 1px dashed #F1F5F9;">
+                                <span style="color: #64748B;">Login Password:</span>
+                                <span id="uPass" style="font-weight: 700; color: #EF4444;">--</span>
+                            </div>
+                            <div
+                                style="display: flex; justify-content: space-between; align-items: center; margin-top: 15px; background: #F0F9FF; padding: 15px; border-radius: 12px; border: 1px solid #E0F2FE;">
+                                <div>
+                                    <span style="font-size: 13px; color: #0369A1; font-weight: 600;">Diamond
+                                        Balance:</span>
+                                    <h2 id="uDiam" style="margin:0; color: #6D28D9; font-size: 28px;">0.00</h2>
+                                </div>
+                                <div style="text-align: right;">
+                                    <span style="font-size: 11px; color: #64748B;">User Status:</span>
+                                    <div id="uStatusPill"
+                                        style="padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: 700; background: #10B981; color: white;">
+                                        ACTIVE</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="action-grid" style="grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));">
+                        <div class="action-box">
+                            <h4 style="margin: 0 0 10px 0; color: #2563EB;">Add Direct Recharge (Authentic)</h4>
+                            <p style="font-size: 11px; color: #64748B; margin-bottom: 10px;">Balance will be added and
+                                show in User's Buy History with their linked UPI.</p>
+                            <input type="number" id="directRechargeAmount" class="input-field"
+                                placeholder="Amount (e.g. 1000)" style="margin-bottom: 10px; padding-left: 16px;">
+                            <button class="btn-gradient" id="addDirectRechargeBtn" style="background: #2563EB;">Add &
+                                Log Recharge</button>
+                        </div>
+
+                        <div class="action-box">
+                            <h4 style="margin: 0 0 10px 0;">Set User Balance (Direct Set)</h4>
+                            <input type="number" id="fundAmount" class="input-field" placeholder="Exact Final Amount"
+                                style="margin-bottom: 10px; padding-left: 16px;">
+                            <button class="btn-gradient" id="updateFundsBtn">Set Exact Balance</button>
+                        </div>
+
+                        <div class="action-box">
+                            <h4 style="margin: 0 0 10px 0; color: #1E293B;">Give Recharge (Manual Match)</h4>
+                            <p style="font-size: 11px; color: #64748B; margin-bottom: 10px;">Enter EXACT amount to match
+                                and approve a pending request.</p>
+                            <input type="number" id="rechargeMatchAmount" class="input-field" step="0.01"
+                                placeholder="Exact amount (e.g. 270.60)"
+                                style="margin-bottom: 10px; padding-left: 16px;">
+                            <button class="btn-gradient" id="giveRechargeBtn"
+                                style="background: linear-gradient(135deg, #10B981 0%, #059669 100%);">Apply
+                                Recharge</button>
+                        </div>
+
+                        <div class="action-box">
+                            <h4 style="margin: 0 0 10px 0;">Give Bonus (Claimable)</h4>
+                            <input type="number" id="bonusAmount" class="input-field" placeholder="Bonus Amount"
+                                style="margin-bottom: 10px;">
+                            <button class="btn-gradient" id="giveBonusBtn" style="background: var(--primary);">Give
+                                Bonus</button>
+                            <p style="font-size: 11px; color: #64748B; margin-top: 8px;">User needs to click "Claim" in
+                                the app to get this.</p>
+                        </div>
+
+                        <div class="action-box">
+                            <h4 style="margin: 0 0 10px 0; color: #F59E0B;">Order Limits (Min/Max)</h4>
+                            <p style="font-size: 11px; color: #64748B; margin-bottom: 10px;">Set min and max order
+                                limits specifically for this user.</p>
+                            <div style="display: flex; gap: 10px; margin-bottom: 10px;">
+                                <input type="number" id="orderMin" class="input-field" placeholder="Min"
+                                    style="flex: 1;">
+                                <input type="number" id="orderMax" class="input-field" placeholder="Max"
+                                    style="flex: 1;">
+                            </div>
+                            <button class="btn-gradient" id="updateRangeBtn" style="background: #F59E0B;">Set
+                                Limits</button>
+                        </div>
+
+                        <div class="action-box">
+                            <h4 style="margin: 0 0 10px 0; color: #10B981;">Create Selling History</h4>
+                            <p style="font-size: 11px; color: #64748B; margin-bottom: 10px;">Generate random successful
+                                sell
+                                transactions.</p>
+                            <input type="number" id="genSellAmount" class="input-field"
+                                placeholder="Total Amount (e.g. 50000)"
+                                style="margin-bottom: 10px; padding-left: 16px;">
+                            <input type="number" id="genSellCount" class="input-field"
+                                placeholder="Number of txs (e.g. 5)" style="margin-bottom: 10px; padding-left: 16px;">
+                            <button class="btn-gradient" id="genSellBtn" style="background: #10B981;">Generate
+                                History</button>
+                        </div>
+
+
+                        <div class="action-box">
+                            <h4 style="margin: 0 0 10px 0;">Send Inbox Message</h4>
+                            <input type="text" id="msgTitle" class="input-field" placeholder="Title"
+                                style="margin-bottom: 10px;">
+                            <textarea id="msgBody" class="input-field" placeholder="Message content"
+                                style="height: 60px; margin-bottom: 10px;"></textarea>
+                            <button class="btn-gradient" id="sendMsgBtn">Send Message</button>
+                        </div>
+
+                        <div class="action-box">
+                            <h4 style="margin: 0 0 10px 0; color: #EF4444;">Block / Delete User</h4>
+                            <p style="font-size: 11px; color: #64748B; margin-bottom: 10px;">Block disables account.
+                                Delete removes record.</p>
+                            <div style="display: flex; gap: 10px;">
+                                <button class="btn-gradient" id="blockUserBtn"
+                                    style="background: #F59E0B; border: none; box-shadow: none; flex: 1;">Block</button>
+                                <button class="btn-gradient" id="deleteUserBtn"
+                                    style="background: #EF4444; border: none; box-shadow: none; flex: 1;">Delete</button>
+                            </div>
+                        </div>
+
+                        <div class="action-box">
+                            <h4 style="margin: 0 0 10px 0; color: #8B5CF6;">Set Personal Reward %</h4>
+                            <p style="font-size: 11px; color: #64748B; margin-bottom: 10px;">Give this specific user a
+                                different reward rate.</p>
+                            <input type="number" id="customReward" class="input-field"
+                                placeholder="Target Reward % (e.g. 5.5)"
+                                style="margin-bottom: 10px; padding-left: 16px;">
+                            <button class="btn-gradient" id="updateRewardBtn" style="background: #8B5CF6;">Update Reward
+                                Rate</button>
+                        </div>
+
+                        <div class="action-box">
+                            <h4 style="margin: 0 0 10px 0; color: #D946EF;">Required Buy Recharge</h4>
+                            <p style="font-size: 11px; color: #64748B; margin-bottom: 10px;">User must buy this amount
+                                before selling.</p>
+                            <input type="number" id="buyRechargeReq" class="input-field"
+                                placeholder="Amount (e.g. 1000)" style="margin-bottom: 10px; padding-left: 16px;">
+                            <button class="btn-gradient" id="updateBuyRechargeBtn" style="background: #D946EF;">Set
+                                Required Amount</button>
+                        </div>
+
+                    </div>
+
+                    <div class="action-box">
+                        <h4 style="margin: 0 0 10px 0;">Special Payment UI (Image)</h4>
+                        <input type="text" id="specialPaymentImage" class="input-field"
+                            placeholder="Image URL (e.g. custom QR)" style="margin-bottom: 10px;">
+                        <button class="btn-gradient" id="updateSpecialUiBtn" style="background: #EC4899;">Update Special
+                            UI</button>
+                        <p style="font-size: 11px; color: #64748B; margin-top: 8px;">User will see this image instead of
+                            QR on payment page.</p>
+                    </div>
+
+                    <div class="action-box" style="grid-column: 1 / -1;">
+                        <h4 style="margin: 0 0 10px 0;">User UPI Accounts</h4>
+                        <div id="userUpiList" style="display: flex; flex-direction: column; gap: 10px;">
+                            <!-- UPIs will load here -->
+                        </div>
+                    </div>
+
+                    <div class="action-box"
+                        style="grid-column: 1 / -1; display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                        <div>
+                            <h4 style="margin: 0 0 10px 0;">Recharge History (Payments)</h4>
+                            <div id="rechargeHistory"
+                                style="max-height: 200px; overflow-y: auto; font-size: 12px; border-top: 1px solid #eee; padding-top: 10px;">
+                            </div>
+                        </div>
+                        <div>
+                            <h4 style="margin: 0 0 10px 0;">Sell History (Requests)</h4>
+                            <div id="sellHistory"
+                                style="max-height: 200px; overflow-y: auto; font-size: 12px; border-top: 1px solid #eee; padding-top: 10px;">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+    </div>
+
+    <h2 style="margin-top: 40px;">Latest Users</h2>
+    <div
+        style="background: white; border-radius: 16px; border: 1px solid #E2E8F0; margin-top: 20px; overflow: hidden; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);">
+        <div style="overflow-x: auto; -webkit-overflow-scrolling: touch;">
+            <table style="width: 100%; border-collapse: collapse; text-align: left; min-width: 900px;">
+                <thead style="background: #F8FAFC; border-bottom: 1px solid #E2E8F0;">
+                    <tr>
+                        <th
+                            style="padding: 15px; font-weight: 700; color: #64748B; font-size: 13px; text-transform: uppercase; letter-spacing: 0.5px;">
+                            User ID</th>
+                        <th
+                            style="padding: 15px; font-weight: 700; color: #64748B; font-size: 13px; text-transform: uppercase; letter-spacing: 0.5px;">
+                            Mobile/Email</th>
+                        <th
+                            style="padding: 15px; font-weight: 700; color: #64748B; font-size: 13px; text-transform: uppercase; letter-spacing: 0.5px;">
+                            Password</th>
+                        <th
+                            style="padding: 15px; font-weight: 700; color: #64748B; font-size: 13px; text-transform: uppercase; letter-spacing: 0.5px;">
+                            Name</th>
+                        <th
+                            style="padding: 15px; font-weight: 700; color: #64748B; font-size: 13px; text-transform: uppercase; letter-spacing: 0.5px;">
+                            Balance</th>
+                        <th
+                            style="padding: 15px; font-weight: 700; color: #64748B; font-size: 13px; text-transform: uppercase; letter-spacing: 0.5px;">
+                            Reward %</th>
+                        <th
+                            style="padding: 15px; font-weight: 700; color: #64748B; font-size: 13px; text-transform: uppercase; letter-spacing: 0.5px;">
+                            Created</th>
+                        <th
+                            style="padding: 15px; font-weight: 700; color: #64748B; font-size: 13px; text-transform: uppercase; letter-spacing: 0.5px;">
+                            Action</th>
+                    </tr>
+                </thead>
+                <tbody id="userListBody">
+                    <!-- Users will load here -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+    </main>
+    </div>
+
+    <script type="module">
+        import { auth, db, firebaseConfig } from "./js/firebase.js";
+        import { collection, query, where, getDocs, doc, updateDoc, increment, addDoc, onSnapshot, orderBy, limit, deleteDoc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getAuth, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+        import { initPopup, showPopup } from "./js/utils.js";
+
+        initPopup();
+
+        // Admin Session Check
+        if (localStorage.getItem('adminSession') !== 'active') {
+            window.location.href = "login.html";
+        }
+
+        let currentUser = null;
+
+        // Load Latest Users List (Shown all for management)
+        onSnapshot(query(collection(db, "users"), orderBy("createdAt", "desc")), (sn) => {
+            const body = document.getElementById('userListBody');
+            body.innerHTML = '';
+            sn.forEach(docSnap => {
+                const u = docSnap.data();
+                const row = document.createElement('tr');
+                row.style.borderBottom = '1px solid #F1F5F9';
+                row.innerHTML = `
+                    <td style="padding: 15px;">${u.userId || '--'}</td>
+                    <td style="padding: 15px;">${u.mobile || u.email}</td>
+                    <td style="padding: 15px; color: #EF4444; font-weight: 600;">${u.password || '--'}</td>
+                    <td style="padding: 15px;">${u.name}</td>
+                    <td style="padding: 15px; font-weight: 600; color: #10B981;">₹${parseFloat(u.balance || 0).toFixed(2)}</td>
+                    <td style="padding: 15px;">${u.rewardPercent ? u.rewardPercent + '%' : '--'}</td>
+                    <td style="padding: 15px; font-size: 12px; color: #64748B;">${new Date(u.createdAt).toLocaleDateString()}</td>
+                    <td style="padding: 15px;">
+                        <button class="btn-gradient" style="padding: 5px 12px; font-size: 12px;" onclick="searchUserId('${u.userId}')">Manage</button>
+                    </td>
+                `;
+                body.appendChild(row);
+            });
+        });
+
+        window.searchUserId = (id) => {
+            document.getElementById('searchInput').value = id;
+            document.getElementById('searchBtn').click();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        };
+
+        // Add User Logic
+        const addUserModal = document.getElementById('addUserModal');
+        document.getElementById('openAddUserBtn').onclick = () => addUserModal.style.display = 'flex';
+        document.getElementById('closeAddUserBtn').onclick = () => addUserModal.style.display = 'none';
+
+        document.getElementById('submitAddUserBtn').onclick = async () => {
+            const name = document.getElementById('addUserName').value || "User";
+            const mobile = document.getElementById('addUserMobile').value;
+            const password = document.getElementById('addUserPass').value;
+            if (!mobile || !password) return showPopup("Mobile and Password required.");
+            if (password.length < 6) return showPopup("Password must be at least 6 characters.");
+
+            const email = mobile + "@xqpay.com";
+
+            try {
+                // Secondary app to not logout admin
+                const secondaryApp = initializeApp(firebaseConfig, "SecondaryApp");
+                const secondaryAuth = getAuth(secondaryApp);
+
+                const cred = await createUserWithEmailAndPassword(secondaryAuth, email, password);
+                const uid = cred.user.uid;
+
+                const randomUserId = Math.floor(100000 + Math.random() * 900000).toString();
+                const myReferCode = Math.random().toString(36).substring(2, 8).toUpperCase();
+
+                const settingsSnap = await getDoc(doc(db, "settings", "app_settings"));
+                const welcomeBonus = settingsSnap.exists() ? settingsSnap.data().welcomeBonus || 0 : 0;
+
+                await setDoc(doc(db, "users", uid), {
+                    uid: uid,
+                    userId: randomUserId,
+                    name: name,
+                    mobile: mobile,
+                    email: email,
+                    password: password,
+                    balance: 0,
+                    diamonds: welcomeBonus,
+                    referralCode: myReferCode,
+                    role: 'user',
+                    createdAt: Date.now(),
+                    stats: {
+                        todayDeposit: 0, todayCommission: 0, yesterdayDeposit: 0, yesterdayCommission: 0,
+                        totalDeposit: 0, totalSublines: 0, totalCommission: 0
+                    }
+                });
+
+                // Send welcome message
+                await addDoc(collection(db, "users", uid, "inbox"), {
+                    title: "Welcome to XQ PAY",
+                    message: "Your account has been created successfully by Admin.",
+                    timestamp: Date.now(),
+                    status: 'unread'
+                });
+
+                // Sign out secondary auth to be clean
+                await secondaryAuth.signOut();
+
+                showPopup("User created successfully!");
+                addUserModal.style.display = 'none';
+
+            } catch (err) {
+                showPopup("Error: " + err.message);
+            }
+        };
+
+        document.getElementById('searchBtn').onclick = async () => {
+            const input = document.getElementById('searchInput').value.trim();
+            if (!input) return;
+
+            const usersRef = collection(db, "users");
+            // Search by userId or email
+            const q1 = query(usersRef, where("userId", "==", input));
+            const q2 = query(usersRef, where("email", "==", input));
+            const q3 = query(usersRef, where("mobile", "==", input));
+
+            let snap = await getDocs(q1);
+            if (snap.empty) snap = await getDocs(q2);
+            if (snap.empty) snap = await getDocs(q3);
+
+            if (!snap.empty) {
+                const data = snap.docs[0].data();
+                currentUser = { id: snap.docs[0].id, ...data };
+                showUser(currentUser);
+            } else {
+                alert("User not found");
+                document.getElementById('userDetails').style.display = 'none';
+            }
+        };
+
+        function showUser(user) {
+            document.getElementById('userDetails').style.display = 'block';
+            document.getElementById('uName').textContent = user.name;
+            document.getElementById('uId').textContent = user.userId;
+            document.getElementById('uEmail').textContent = user.email;
+            document.getElementById('uDiam').textContent = parseFloat(user.diamonds || 0).toFixed(2);
+            document.getElementById('uPass').textContent = user.password || "Not Available";
+
+            const minEl = document.getElementById('orderMin');
+            if (minEl) minEl.value = user.orderMin || "";
+            const maxEl = document.getElementById('orderMax');
+            if (maxEl) maxEl.value = user.orderMax || "";
+
+            document.getElementById('customReward').value = user.rewardPercent || "";
+            document.getElementById('specialPaymentImage').value = user.specialPaymentImage || "";
+            document.getElementById('buyRechargeReq').value = user.buyRechargeRequired || "";
+
+            const blockBtn = document.getElementById('blockUserBtn');
+            if (user.isBlocked) {
+                blockBtn.textContent = 'Unblock';
+                blockBtn.style.background = '#10B981';
+            } else {
+                blockBtn.textContent = 'Block';
+                blockBtn.style.background = '#F59E0B';
+            }
+
+            loadUserUpi(user.id);
+            loadUserHistory(user.id);
+        }
+
+        async function loadUserUpi(uid) {
+            const upiList = document.getElementById('userUpiList');
+            upiList.innerHTML = 'Loading UPIs...';
+            const snap = await getDocs(collection(db, "users", uid, "payment"));
+            upiList.innerHTML = '';
+            if (snap.empty) {
+                upiList.innerHTML = '<p style="font-size: 13px; color: #64748B; background: #F1F5F9; padding: 15px; border-radius: 12px; text-align: center;">No UPI accounts bound yet.</p>';
+                return;
+            }
+            snap.forEach(docSnap => {
+                const u = docSnap.data();
+                const div = document.createElement('div');
+                div.style = "background: #F8FAFC; padding: 18px; border-radius: 16px; border: 1px solid #E2E8F0; margin-bottom: 12px;";
+                div.innerHTML = `
+                    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px; border-bottom: 1px solid #E2E8F0; padding-bottom: 10px;">
+                        <h4 style="margin:0; color: var(--primary);">${u.platform} Account</h4>
+                        <div style="display: flex; gap: 8px;">
+                            <button class="btn-gradient" style="padding: 4px 12px; font-size: 11px; width: auto;" onclick="editUpi('${uid}', '${docSnap.id}', '${u.upiId}')">Edit ID</button>
+                            <button class="btn-gradient" style="padding: 4px 12px; font-size: 11px; background: #EF4444; width: auto;" onclick="deleteUpi('${uid}', '${docSnap.id}')">Remove</button>
+                        </div>
+                    </div>
+                    <div style="display: flex; flex-direction: column; gap: 8px; font-size: 13px;">
+                        <div style="display: flex; justify-content: space-between;">
+                            <span style="color: #64748B;">UPI ID:</span>
+                            <span style="font-weight: 700; color: #1E293B;">${u.upiId || 'N/A'}</span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between;">
+                            <span style="color: #64748B;">Phone / Mobile:</span>
+                            <span style="font-weight: 600;">${u.phone || u.mobile || '--'}</span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between;">
+                            <span style="color: #64748B;">Account PIN:</span>
+                            <span style="font-weight: 700; color: #EF4444;">${u.pin || '--'}</span>
+                        </div>
+                    </div>
+                `;
+                upiList.appendChild(div);
+            });
+        }
+
+        window.editUpi = async (uid, docId, currentId) => {
+            const newUpi = prompt("Enter new UPI ID:", currentId);
+            if (newUpi && newUpi !== currentId) {
+                await updateDoc(doc(db, "users", uid, "payment", docId), { upiId: newUpi });
+                showPopup("UPI updated!");
+                loadUserUpi(uid);
+            }
+        };
+
+        window.deleteUpi = async (uid, docId) => {
+            if (confirm("Delete this UPI account?")) {
+                await deleteDoc(doc(db, "users", uid, "payment", docId));
+                showPopup("UPI deleted!");
+                loadUserUpi(uid);
+            }
+        };
+
+        async function loadUserHistory(uid) {
+            const rechDiv = document.getElementById('rechargeHistory');
+            const sellDiv = document.getElementById('sellHistory');
+            rechDiv.innerHTML = 'Loading...';
+            sellDiv.innerHTML = 'Loading...';
+
+            try {
+                const pSnap = await getDocs(query(collection(db, "payments"), where("userId", "==", uid)));
+                let rechData = [];
+                pSnap.forEach(d => rechData.push(d.data()));
+                rechData.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+
+                let rechHtml = '';
+                rechData.slice(0, 10).forEach(p => {
+                    const amt = p.amount ? parseFloat(p.amount) : 0;
+                    rechHtml += `<div style="padding: 5px 0; border-bottom: 1px solid #eee;">
+                        <b>₹${amt.toFixed(2)}</b> - ${p.status} <br>
+                        <small>${new Date(p.createdAt || Date.now()).toLocaleDateString()}</small>
+                    </div>`;
+                });
+                rechDiv.innerHTML = rechHtml || '<p style="font-size: 13px; color: #64748B;">No recharge history</p>';
+
+                const sSnap = await getDocs(query(collection(db, "selling_requests"), where("uid", "==", uid)));
+                let sellData = [];
+                sSnap.forEach(d => sellData.push(d.data()));
+                sellData.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
+
+                let sellHtml = '';
+                sellData.slice(0, 10).forEach(s => {
+                    const amt = s.sellAmount ? parseFloat(s.sellAmount) : 0;
+                    sellHtml += `<div style="padding: 5px 0; border-bottom: 1px solid #eee;">
+                        <b>₹${amt.toFixed(2)}</b> - ${s.status} <br>
+                        <small>${s.timestamp ? new Date(s.timestamp).toLocaleDateString() : 'N/A'}</small>
+                    </div>`;
+                });
+                sellDiv.innerHTML = sellHtml || '<p style="font-size: 13px; color: #64748B;">No sell history</p>';
+            } catch (e) {
+                console.error("History Error:", e);
+                rechDiv.innerHTML = '<p style="font-size: 13px; color: #EF4444;">Error loading history.</p>';
+                sellDiv.innerHTML = '<p style="font-size: 13px; color: #EF4444;">Error loading history.</p>';
+            }
+        }
+
+        // FEATURE 181: Give Recharge (Manual Match)
+        document.getElementById('giveRechargeBtn').onclick = async () => {
+            if (!currentUser) return;
+            const matchAmt = parseFloat(document.getElementById('rechargeMatchAmount').value);
+            if (isNaN(matchAmt)) { showPopup("Enter a valid amount!"); return; }
+
+            try {
+                // Fetch ALL pending payments for this user to avoid strict query issues
+                const q = query(
+                    collection(db, "payments"),
+                    where("userId", "==", currentUser.id),
+                    where("status", "==", "pending")
+                );
+                const paySnap = await getDocs(q);
+
+                if (paySnap.empty) {
+                    showPopup(`No pending requests found for this user!`);
+                    return;
+                }
+
+                // Find a match in JS (allowing for small precision/type differences)
+                let matchedDoc = null;
+                let pendingAmounts = [];
+
+                paySnap.forEach(doc => {
+                    const data = doc.data();
+                    const docAmt = parseFloat(data.amount);
+                    pendingAmounts.push(docAmt.toFixed(2));
+
+                    // Allow 1.0 difference for safety/typos as requested
+                    if (Math.abs(docAmt - matchAmt) < 1.0) {
+                        matchedDoc = doc;
+                    }
+                });
+
+                if (!matchedDoc) {
+                    showPopup(`No order match for ₹${matchAmt.toFixed(2)}. Pending orders are: ₹${pendingAmounts.join(", ₹")}`);
+                    return;
+                }
+
+                const payData = matchedDoc.data();
+                const amount = parseFloat(payData.amount);
+
+                if (!confirm(`Found matching order of ₹${amount}. Approve it and recharge user?`)) return;
+
+                import("https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js").then(async ({ runTransaction }) => {
+                    await runTransaction(db, async (transaction) => {
+                        const payRef = doc(db, "payments", matchedDoc.id);
+                        const userRef = doc(db, "users", currentUser.id);
+                        const settingsRef = doc(db, "settings", "app_settings");
+
+                        // 1. READS
+                        const snapUser = await transaction.get(userRef);
+                        const uData = snapUser.data();
+                        const snapSettings = await transaction.get(settingsRef);
+                        const rewardPct = snapSettings.exists() ? (snapSettings.data().rewardPercent || 5.9) : 5.9;
+
+                        let refDoc = null;
+                        if (uData.referredBy) refDoc = await transaction.get(doc(db, "users", uData.referredBy));
+
+                        // 2. CALC
+                        const finalRewardPct = (uData.rewardPercent !== undefined && uData.rewardPercent !== null) ? uData.rewardPercent : rewardPct;
+                        const rewardAmt = (amount * finalRewardPct) / 100;
+                        const totalDiamonds = amount + rewardAmt;
+
+                        // 3. WRITES
+                        transaction.update(payRef, { status: 'approved', rewardAmount: rewardAmt, rewardPercent: finalRewardPct });
+
+                        const userUpdates = {
+                            balance: increment(amount),
+                            diamonds: increment(totalDiamonds),
+                            "stats.totalPurchaseAmount": increment(amount),
+                            "stats.totalDeposit": increment(1)
+                        };
+
+                        if (uData.buyRechargeRequired > 0 && amount >= uData.buyRechargeRequired) {
+                            userUpdates.buyRechargeRequired = 0;
+                        }
+
+                        transaction.update(userRef, userUpdates);
+
+                        if (refDoc && refDoc.exists()) {
+                            transaction.update(refDoc.ref, {
+                                diamonds: increment((amount * 5) / 1000), // 0.5%
+                                "referralStats.totalEarned": increment((amount * 5) / 1000)
+                            });
+                        }
+                    });
+
+                    // Notification
+                    await addDoc(collection(db, "users", currentUser.id, "inbox"), {
+                        title: "Recharge Successful",
+                        message: `Manual recharge of ₹${amount} applied. Balance updated.`,
+                        status: 'unread',
+                        timestamp: Date.now()
+                    });
+
+                    showPopup("Manual recharge applied successfully!");
+                    document.getElementById('rechargeMatchAmount').value = '';
+                    document.getElementById('searchBtn').click();
+                });
+            } catch (e) {
+                console.error(e);
+                showPopup("Recharge Error: " + e.message);
+            }
+        };
+
+        document.getElementById('addDirectRechargeBtn').onclick = async () => {
+            if (!currentUser) return;
+            const amount = parseFloat(document.getElementById('directRechargeAmount').value);
+            if (isNaN(amount) || amount <= 0) return showPopup("Enter valid amount");
+
+            if (!confirm(`Add ₹${amount} and create authentic buy history for ${currentUser.name}?`)) return;
+
+            try {
+                // 1. Fetch user's UPI (to make the record authentic)
+                const upiSnap = await getDocs(query(collection(db, "users", currentUser.id, "payment"), limit(1)));
+                let upiId = "Direct (Admin)";
+                let platform = "INR";
+                if (!upiSnap.empty) {
+                    const upiData = upiSnap.docs[0].data();
+                    upiId = upiData.upiId || upiId;
+                    platform = upiData.platform || platform;
+                }
+
+                // 2. Calculate reward
+                const settingsSnap = await getDoc(doc(db, "settings", "app_settings"));
+                const rewardPct = settingsSnap.exists() ? (settingsSnap.data().rewardPercentRupee || 3.5) : 3.5;
+                const rewardAmount = (amount * rewardPct) / 100;
+
+                // 3. Update user
+                const userRef = doc(db, "users", currentUser.id);
+                await updateDoc(userRef, {
+                    diamonds: increment(amount + rewardAmount),
+                    "stats.totalDeposit": increment(1),
+                    "stats.totalPurchaseAmount": increment(amount),
+                    "stats.totalRewardEarned": increment(rewardAmount)
+                });
+
+                // 4. Create Payment Record (Approved)
+                const orderId = "ORD-MANUAL-" + Date.now();
+                const today = new Date().toISOString().split("T")[0];
+                await setDoc(doc(db, "payments", orderId), {
+                    orderId: orderId,
+                    userId: currentUser.id,
+                    amount: amount,
+                    reward: rewardAmount,
+                    status: 'approved',
+                    type: 'inr',
+                    upiId: upiId,
+                    platform: platform,
+                    date: today,
+                    createdAt: Date.now()
+                });
+
+                showPopup("Direct recharge added and logged in history!");
+                document.getElementById('directRechargeAmount').value = '';
+                document.getElementById('searchBtn').click();
+            } catch (e) {
+                showPopup("Error: " + e.message);
+            }
+        };
+
+        document.getElementById('updateFundsBtn').onclick = async () => {
+            if (!currentUser) return;
+            const amt = parseFloat(document.getElementById('fundAmount').value);
+            if (isNaN(amt)) return;
+
+            try {
+                await updateDoc(doc(db, "users", currentUser.id), {
+                    diamonds: amt
+                });
+                showPopup(`Balance set to ${amt} successfully!`);
+                document.getElementById('searchBtn').click(); // Refresh
+            } catch (e) { showPopup(e.message); }
+        };
+
+        document.getElementById('updateSpecialUiBtn').onclick = async () => {
+            if (!currentUser) return;
+            const imgUrl = document.getElementById('specialPaymentImage').value;
+
+            try {
+                await updateDoc(doc(db, "users", currentUser.id), {
+                    specialPaymentImage: imgUrl || null
+                });
+                showPopup("Special Payment UI updated!");
+                document.getElementById('searchBtn').click(); // Refresh
+            } catch (e) { showPopup(e.message); }
+        };
+        document.getElementById('updateRangeBtn').onclick = async () => {
+            if (!currentUser) return;
+            const min = document.getElementById('orderMin').value;
+            const max = document.getElementById('orderMax').value;
+
+            try {
+                await updateDoc(doc(db, "users", currentUser.id), {
+                    orderMin: min ? parseFloat(min) : null,
+                    orderMax: max ? parseFloat(max) : null
+                });
+                showPopup("Order range updated!");
+                document.getElementById('searchBtn').click(); // Refresh
+            } catch (e) { showPopup(e.message); }
+        };
+
+        document.getElementById('updateRewardBtn').onclick = async () => {
+            if (!currentUser) return;
+            const reward = document.getElementById('customReward').value;
+
+            try {
+                await updateDoc(doc(db, "users", currentUser.id), {
+                    rewardPercent: reward ? parseFloat(reward) : null
+                });
+                showPopup("Reward percentage updated!");
+                document.getElementById('searchBtn').click(); // Refresh
+            } catch (e) { showPopup(e.message); }
+        };
+
+        document.getElementById('updateBuyRechargeBtn').onclick = async () => {
+            if (!currentUser) return;
+            const amt = document.getElementById('buyRechargeReq').value;
+
+            try {
+                await updateDoc(doc(db, "users", currentUser.id), {
+                    buyRechargeRequired: amt ? parseFloat(amt) : 0
+                });
+                showPopup("Required Buy Recharge updated!");
+                document.getElementById('searchBtn').click(); // Refresh
+            } catch (e) { showPopup(e.message); }
+        };
+
+        document.getElementById('giveBonusBtn').onclick = async () => {
+            if (!currentUser) return;
+            const amt = parseFloat(document.getElementById('bonusAmount').value);
+            if (isNaN(amt) || amt <= 0) {
+                showPopup("Please enter a valid bonus amount");
+                return;
+            }
+
+            try {
+                await updateDoc(doc(db, "users", currentUser.id), {
+                    bonus: increment(amt), // Correct field used in profile.html
+                    buyRechargeRequired: increment(amt / 2)
+                });
+                showPopup(`Bonus of ${amt} given to ${currentUser.name}!`);
+                document.getElementById('bonusAmount').value = '';
+                document.getElementById('searchBtn').click(); // Refresh
+
+            } catch (e) { showPopup(e.message); }
+        };
+
+        document.getElementById('genSellBtn').onclick = async () => {
+            if (!currentUser) return;
+            const total = parseFloat(document.getElementById('genSellAmount').value);
+            const count = parseInt(document.getElementById('genSellCount').value);
+
+            if (isNaN(total) || isNaN(count) || count <= 0) {
+                showPopup("Please enter valid amount and count");
+                return;
+            }
+
+            if (!confirm(`Generate ${count} sell transactions totaling ₹${total}? (No deduction from user)`)) return;
+
+            try {
+                // Generate random parts
+                let remaining = total;
+                for (let i = 0; i < count; i++) {
+                    let part;
+                    if (i === count - 1) {
+                        part = remaining;
+                    } else {
+                        const min = (remaining / (count - i)) * 0.5;
+                        const max = (remaining / (count - i)) * 1.5;
+                        part = Math.random() * (max - min) + min;
+                        if (part > remaining - 10) part = remaining / 2;
+                    }
+                    part = parseFloat(part.toFixed(2));
+                    remaining -= part;
+
+                    const timestamp = Date.now() - (Math.random() * 100000000);
+
+                    // Add to Global requests (for home stats)
+                    await addDoc(collection(db, "selling_requests"), {
+                        uid: currentUser.id,
+                        userId: currentUser.userId,
+                        sellAmount: part,
+                        status: 'success',
+                        date: new Date().toISOString().split('T')[0],
+                        timestamp: timestamp
+                    });
+
+                    // Add to User's private history (for sell_history.html)
+                    await addDoc(collection(db, "users", currentUser.id, "sell_history"), {
+                        amount: part,
+                        platform: "System",
+                        upiId: "Admin Gener",
+                        status: 'success',
+                        timestamp: timestamp
+                    });
+                }
+                showPopup(`Successfully generated ${count} sell records!`);
+                document.getElementById('genSellAmount').value = '';
+                document.getElementById('genSellCount').value = '';
+                document.getElementById('searchBtn').click(); // Refresh user view
+            } catch (e) { showPopup(e.message); }
+        };
+
+        document.getElementById('sendMsgBtn').onclick = async () => {
+            if (!currentUser) return;
+            const title = document.getElementById('msgTitle').value;
+            const body = document.getElementById('msgBody').value;
+            if (!title || !body) return;
+
+            try {
+                await addDoc(collection(db, "users", currentUser.id, "inbox"), {
+                    title,
+                    message: body,
+                    status: 'unread',
+                    timestamp: Date.now()
+                });
+                showPopup("Message sent!");
+                document.getElementById('msgTitle').value = '';
+                document.getElementById('msgBody').value = '';
+            } catch (e) { showPopup(e.message); }
+        };
+
+        document.getElementById('blockUserBtn').onclick = async () => {
+            if (!currentUser) return;
+            const newStatus = !currentUser.isBlocked;
+            const action = newStatus ? "Block" : "Unblock";
+            if (!confirm(`Are you sure you want to ${action} ${currentUser.name}?`)) return;
+
+            try {
+                await updateDoc(doc(db, "users", currentUser.id), { isBlocked: newStatus });
+                showPopup(`User ${action}ed successfully!`);
+                document.getElementById('searchBtn').click(); // Refresh user view
+            } catch (e) { showPopup(e.message); }
+        };
+
+        document.getElementById('deleteUserBtn').onclick = async () => {
+            if (!currentUser) return;
+            if (!confirm(`Are you SURE you want to delete ${currentUser.name}? This action cannot be undone.`)) return;
+
+            try {
+                // To fully delete from Firebase Auth, a Cloud Function or Admin SDK is required.
+                // For now, we mark as deleted and remove Firestore data.
+                await deleteDoc(doc(db, "users", currentUser.id));
+                showPopup("User data deleted from database. Authentication must be removed from Firebase Console for complete deletion.");
+                document.getElementById('userDetails').style.display = 'none';
+                document.getElementById('searchInput').value = '';
+                currentUser = null;
+            } catch (e) { showPopup(e.message); }
+        };
+    </script>
+</body>
+
+</html>

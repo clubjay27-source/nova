@@ -1,0 +1,257 @@
+<!-- admin/orders.html -->
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage INR Orders - Admin</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        body {
+            max-width: 100%;
+            margin: 0;
+            background: linear-gradient(135deg, #BAE6FD 0%, #E0F2FE 100%);
+            min-height: 100vh;
+        }
+
+        .admin-layout {
+            display: grid;
+            grid-template-columns: 240px 1fr;
+            min-height: 100vh;
+            width: 100%;
+        }
+
+        .sidebar {
+            background: white;
+            padding: 20px;
+            border-right: 1px solid #E2E8F0;
+        }
+
+        .sidebar-menu {
+            list-style: none;
+            margin-top: 30px;
+        }
+
+        .sidebar-menu a {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            text-decoration: none;
+            color: var(--text-gray);
+            border-radius: 8px;
+        }
+
+        .sidebar-menu a.active {
+            background: var(--primary);
+            color: white;
+        }
+
+        .content {
+            padding: 40px;
+        }
+
+        .form-card {
+            background: white;
+            padding: 24px;
+            border-radius: 16px;
+            margin-bottom: 30px;
+        }
+
+        .order-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+        }
+
+        .order-table th,
+        .order-table td {
+            padding: 16px;
+            text-align: left;
+            border-bottom: 1px solid #F1F5F9;
+        }
+
+        .order-table th {
+            background: #F8FAFC;
+            color: var(--text-gray);
+            font-weight: 600;
+        }
+
+        .delete-btn {
+            color: var(--danger);
+            cursor: pointer;
+            border: none;
+            background: none;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="admin-layout">
+        <aside class="sidebar">
+            <ul class="sidebar-menu">
+                <li><a href="index.html"><i class="fa-solid fa-chart-line"></i> Dashboard</a></li>
+                <li><a href="orders.html" class="active"><i class="fa-solid fa-list"></i> INR Orders</a></li>
+                <li><a href="payments.html"><i class="fa-solid fa-receipt"></i> Payment Approvals</a></li>
+                <li><a href="selling_requests.html"><i class="fa-solid fa-hand-holding-dollar"></i> Selling Requests</a>
+                </li>
+                <li><a href="users.html"><i class="fa-solid fa-users"></i> Users Management</a></li>
+                <li><a href="gift_codes.html"><i class="fa-solid fa-gift"></i> Gift Codes</a></li>
+                <li><a href="banner.html"><i class="fa-solid fa-image"></i> Banners</a></li>
+                <li><a href="tutorial.html"><i class="fa-solid fa-graduation-cap"></i> Tutorials</a></li>
+                <li><a href="popups.html"><i class="fa-solid fa-window-maximize"></i> App Popups</a></li>
+                <li><a href="settings.html"><i class="fa-solid fa-gear"></i> App Settings</a></li>
+                <li><a href="../index.html" style="color: var(--danger); margin-top: 20px;"><i
+                            class="fa-solid fa-arrow-left"></i> Exit Admin</a></li>
+            </ul>
+        </aside>
+
+        <main class="content">
+            <h1>Manage INR Orders</h1>
+
+            <div class="form-card">
+                <h3>Add New Order</h3>
+                <form id="addOrderForm"
+                    style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 20px;">
+                    <div>
+                        <label style="font-size: 13px; color: var(--text-gray);">Amount (INR)</label>
+                        <input type="number" id="orderAmount" class="input-field" style="padding-left: 16px;" required>
+                    </div>
+                    <div>
+                        <label style="font-size: 13px; color: var(--text-gray);">Quantity</label>
+                        <input type="number" id="orderQty" class="input-field" style="padding-left: 16px;" value="10"
+                            required>
+                    </div>
+                    <div>
+                        <label style="font-size: 13px; color: var(--text-gray);">Reward %</label>
+                        <input type="number" id="rewardPercent" class="input-field" step="0.01"
+                            style="padding-left: 16px;" value="3.50" required>
+                    </div>
+                    <div>
+                        <label style="font-size: 13px; color: var(--text-gray);">Fixed Bonus (INR)</label>
+                        <input type="number" id="bonusAmount" class="input-field" step="0.01"
+                            style="padding-left: 16px;" value="6.00" required>
+                    </div>
+                    <div style="display: flex; align-items: flex-end; gap: 10px; grid-column: span 2;">
+                        <button type="submit" class="btn-gradient">Create Order</button>
+                        <button type="button" id="generateOrdersBtn" class="btn-gradient"
+                            style="background: var(--text-gray);">Generate 200 Orders</button>
+                    </div>
+                </form>
+            </div>
+
+            <table class="order-table">
+                <thead>
+                    <tr>
+                        <th>Amount</th>
+                        <th>Reward</th>
+                        <th>Bonus</th>
+                        <th>Status</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody id="orderTableBody">
+                    <!-- Orders will be loaded here -->
+                </tbody>
+            </table>
+        </main>
+    </div>
+
+    <script type="module">
+        import { auth, db } from "./js/firebase.js";
+        import { collection, addDoc, onSnapshot, doc, deleteDoc, query, orderBy } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+        import { initPopup, showPopup } from "./js/utils.js";
+
+        initPopup();
+
+        // Admin Session Check
+        if (localStorage.getItem('adminSession') !== 'active') {
+            window.location.href = "login.html";
+        }
+
+        const addOrderForm = document.getElementById('addOrderForm');
+        const orderTableBody = document.getElementById('orderTableBody');
+
+        addOrderForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const amount = document.getElementById('orderAmount').value;
+            const qty = document.getElementById('orderQty').value;
+            const reward = document.getElementById('rewardPercent').value;
+            const bonus = document.getElementById('bonusAmount').value;
+
+            try {
+                await addDoc(collection(db, "orders"), {
+                    amount: Number(amount),
+                    quantity: Number(qty),
+                    rewardPercent: Number(reward),
+                    bonus: Number(bonus),
+                    type: "INR",
+                    status: "available",
+                    createdAt: Date.now(),
+                    date: new Date().toISOString().split("T")[0]
+                });
+                showPopup("Order added successfully");
+                addOrderForm.reset();
+            } catch (error) {
+                console.error(error);
+                showPopup("Error adding order");
+            }
+        });
+
+        document.getElementById('generateOrdersBtn').addEventListener('click', async () => {
+            if (!confirm("Generate 200 random orders (100-49000)?")) return;
+            showPopup("Generating orders... Please wait.");
+
+            try {
+                // Batching is better but for 200 items simple loop is okay if Firestore allows
+                for (let i = 1; i <= 200; i++) {
+                    const amount = Math.floor(Math.random() * (49000 - 100) + 100);
+                    await addDoc(collection(db, "orders"), {
+                        amount: amount,
+                        quantity: 50,
+                        rewardPercent: 3.50,
+                        bonus: 6.00,
+                        type: "INR",
+                        status: "available",
+                        createdAt: Date.now(),
+                        date: new Date().toISOString().split("T")[0]
+                    });
+                }
+                showPopup("200 Orders Created Successfully!");
+            } catch (error) {
+                console.error(error);
+                showPopup("Error generating orders");
+            }
+        });
+
+        onSnapshot(query(collection(db, "orders"), orderBy("createdAt", "desc")), (snapshot) => {
+            orderTableBody.innerHTML = '';
+            snapshot.forEach(docSnap => {
+                const order = docSnap.data();
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td style="font-weight: 700;">₹ ${parseFloat(order.amount).toFixed(2)}</td>
+                    <td>${order.rewardPercent}%</td>
+                    <td>₹ ${order.bonus}</td>
+                    <td><span style="color: ${order.status === 'available' ? 'var(--success)' : 'var(--text-gray)'}">${order.status}</span></td>
+                    <td><button class="delete-btn" onclick="deleteOrder('${docSnap.id}')"><i class="fa-solid fa-trash"></i></button></td>
+                `;
+                orderTableBody.appendChild(tr);
+            });
+        });
+
+        window.deleteOrder = async (id) => {
+            if (confirm("Delete this order?")) {
+                await deleteDoc(doc(db, "orders", id));
+            }
+        };
+    </script>
+</body>
+
+</html>

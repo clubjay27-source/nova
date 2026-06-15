@@ -1,0 +1,54 @@
+<!-- login.html -->
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Login - XQ PAY</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/login.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#6C3EF4">
+</head>
+
+<body>
+    <div class="auth-container">
+        <div class="auth-header">
+            <h1 style="color: var(--text-dark); margin-top: 50px;">Sign in</h1>
+            <p>Enter your details below</p>
+        </div>
+
+        <div class="login-card" style="box-shadow: none; border: 1px solid #eee;">
+            <form id="adminLoginForm">
+                <div class="input-group">
+                    <i class="fa-solid fa-user" style="color: #94a3b8;"></i>
+                    <input type="text" id="adminId" class="input-field" placeholder="Username" required>
+                </div>
+                <div class="input-group">
+                    <i class="fa-solid fa-lock" style="color: #94a3b8;"></i>
+                    <input type="password" id="adminPass" class="input-field" placeholder="Password" required>
+                </div>
+                <button type="submit" class="login-btn"
+                    style="width:100%; margin-top: 10px; background: #1e293b;">Login</button>
+            </form>
+        </div>
+
+        <div class="auth-footer">
+            <p>&copy; 2026 App Support Portal</p>
+        </div>
+    </div>
+
+    <div class="loader-overlay" id="loader">
+        <div class="spinner"></div>
+    </div>
+
+    <script type="module">
+        import { initPopup } from "./js/utils.js";
+        initPopup();
+    </script>
+    <script type="module" src="js/auth.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,179 @@
+<!-- admin/tutorial.html -->
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Tutorials - Admin</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        body {
+            max-width: 100%;
+            margin: 0;
+            background: linear-gradient(135deg, #BAE6FD 0%, #E0F2FE 100%);
+            min-height: 100vh;
+        }
+
+        .admin-layout {
+            display: grid;
+            grid-template-columns: 240px 1fr;
+            min-height: 100vh;
+            width: 100%;
+        }
+
+        .sidebar {
+            background: white;
+            padding: 20px;
+            border-right: 1px solid #E2E8F0;
+        }
+
+        .sidebar-menu {
+            list-style: none;
+            margin-top: 30px;
+        }
+
+        .sidebar-menu li {
+            margin-bottom: 10px;
+        }
+
+        .sidebar-menu a {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            text-decoration: none;
+            color: var(--text-gray);
+            border-radius: 8px;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+
+        .sidebar-menu a:hover,
+        .sidebar-menu a.active {
+            background: var(--primary);
+            color: white;
+        }
+
+        .content {
+            padding: 40px;
+        }
+
+        .form-card {
+            background: white;
+            padding: 24px;
+            border-radius: 16px;
+            max-width: 600px;
+            margin-bottom: 30px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="admin-layout">
+        <aside class="sidebar">
+            <ul class="sidebar-menu">
+                <li><a href="index.html"><i class="fa-solid fa-chart-line"></i> Dashboard</a></li>
+                <li><a href="orders.html"><i class="fa-solid fa-list"></i> INR Orders</a></li>
+                <li><a href="payments.html"><i class="fa-solid fa-receipt"></i> Payment Approvals</a></li>
+                <li><a href="selling_requests.html"><i class="fa-solid fa-hand-holding-dollar"></i> Selling Requests</a>
+                </li>
+                <li><a href="users.html"><i class="fa-solid fa-users"></i> Users Management</a></li>
+                <li><a href="gift_codes.html"><i class="fa-solid fa-gift"></i> Gift Codes</a></li>
+                <li><a href="banner.html"><i class="fa-solid fa-image"></i> Banners</a></li>
+                <li><a href="tutorial.html" class="active"><i class="fa-solid fa-graduation-cap"></i> Tutorials</a></li>
+                <li><a href="popups.html"><i class="fa-solid fa-window-maximize"></i> App Popups</a></li>
+                <li><a href="settings.html"><i class="fa-solid fa-gear"></i> App Settings</a></li>
+                <li><a href="../index.html" style="color: var(--danger); margin-top: 20px;"><i
+                            class="fa-solid fa-arrow-left"></i> Exit Admin</a></li>
+            </ul>
+        </aside>
+
+        <main class="content">
+            <h1>Manage Tutorials</h1>
+
+            <div class="form-card" style="margin-top: 20px;">
+                <h3>Add New Tutorial</h3>
+                <form id="tutorialForm" style="display: flex; flex-direction: column; gap: 16px; margin-top: 16px;">
+                    <input type="text" id="tutTitle" class="input-field" placeholder="Tutorial Title"
+                        style="padding-left: 16px;" required>
+                    <input type="text" id="tutLink" class="input-field"
+                        placeholder="External Video/Article Link (Optional)" style="padding-left: 16px;">
+                    <p style="font-size: 12px; color: var(--text-gray); margin-bottom: -10px;">- OR -</p>
+                    <textarea id="tutContent" class="input-field"
+                        placeholder="Internal Tutorial Content (HTML supported)"
+                        style="padding: 12px; height: 150px;"></textarea>
+                    <button type="submit" class="btn-gradient">Add Tutorial</button>
+                </form>
+            </div>
+
+            <table class="order-table" style="width: 100%; border-radius: 12px; overflow: hidden; background: white;">
+                <thead>
+                    <tr>
+                        <th style="padding: 16px; text-align: left;">Date</th>
+                        <th style="padding: 16px; text-align: left;">Title</th>
+                        <th style="padding: 16px; text-align: left;">Action</th>
+                    </tr>
+                </thead>
+                <tbody id="tutorialTableBody">
+                    <!-- Tutorials will be loaded here -->
+                </tbody>
+            </table>
+        </main>
+    </div>
+
+    <script type="module">
+        import { auth, db } from "./js/firebase.js";
+        import { collection, addDoc, onSnapshot, query, orderBy, doc, deleteDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+        import { initPopup, showPopup } from "./js/utils.js";
+
+        initPopup();
+
+        // Admin Session Check
+        if (localStorage.getItem('adminSession') !== 'active') {
+            window.location.href = "login.html";
+        }
+        const tutorialForm = document.getElementById('tutorialForm');
+        const tutorialTableBody = document.getElementById('tutorialTableBody');
+
+        tutorialForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const title = document.getElementById('tutTitle').value;
+            const link = document.getElementById('tutLink').value || "";
+            const content = document.getElementById('tutContent').value || "";
+            try {
+                await addDoc(collection(db, "tutorials"), {
+                    title,
+                    link,
+                    content,
+                    createdAt: serverTimestamp()
+                });
+                showPopup("Tutorial added!");
+                tutorialForm.reset();
+            } catch (error) { showPopup(error.message); }
+        });
+
+        onSnapshot(query(collection(db, "tutorials"), orderBy("createdAt", "desc")), (snapshot) => {
+            tutorialTableBody.innerHTML = '';
+            snapshot.forEach(docSnap => {
+                const t = docSnap.data();
+                const tr = document.createElement('tr');
+                const date = t.createdAt?.toDate ? t.createdAt.toDate().toLocaleDateString() : 'N/A';
+                tr.innerHTML = `
+                    <td style="padding: 16px;">${date}</td>
+                    <td style="padding: 16px; font-weight: 500;">${t.title}</td>
+                    <td style="padding: 16px;"><button class="delete-btn" onclick="deleteTutorial('${docSnap.id}')"><i class="fa-solid fa-trash"></i></button></td>
+                `;
+                tutorialTableBody.appendChild(tr);
+            });
+        });
+
+        window.deleteTutorial = async (id) => {
+            if (confirm("Delete tutorial?")) { await deleteDoc(doc(db, "tutorials", id)); }
+        };
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,318 @@
+<!-- admin/payments.html -->
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payment Approvals - Admin</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        body {
+            max-width: 100%;
+            margin: 0;
+            background: linear-gradient(135deg, #BAE6FD 0%, #E0F2FE 100%);
+            min-height: 100vh;
+        }
+
+        .admin-layout {
+            display: grid;
+            grid-template-columns: 240px 1fr;
+            min-height: 100vh;
+            width: 100%;
+        }
+
+        .sidebar {
+            background: white;
+            padding: 20px;
+            border-right: 1px solid #E2E8F0;
+        }
+
+        .sidebar-menu {
+            list-style: none;
+            margin-top: 30px;
+        }
+
+        .sidebar-menu a {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            text-decoration: none;
+            color: var(--text-gray);
+            border-radius: 8px;
+        }
+
+        .sidebar-menu a.active {
+            background: var(--primary);
+            color: white;
+        }
+
+        .content {
+            padding: 40px;
+        }
+
+        .order-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+        }
+
+        .order-table th,
+        .order-table td {
+            padding: 16px;
+            text-align: left;
+            border-bottom: 1px solid #F1F5F9;
+        }
+
+        .order-table th {
+            background: #F8FAFC;
+            color: var(--text-gray);
+            font-weight: 600;
+        }
+
+        .approve-btn {
+            background: var(--success);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            margin-right: 8px;
+            font-weight: 600;
+        }
+
+        .decline-btn {
+            background: var(--danger);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            font-weight: 600;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="admin-layout">
+        <aside class="sidebar">
+            <ul class="sidebar-menu">
+                <li><a href="index.html"><i class="fa-solid fa-chart-line"></i> Dashboard</a></li>
+                <li><a href="orders.html"><i class="fa-solid fa-list"></i> INR Orders</a></li>
+                <li><a href="payments.html" class="active"><i class="fa-solid fa-receipt"></i> Payment Approvals</a>
+                </li>
+                <li><a href="selling_requests.html"><i class="fa-solid fa-hand-holding-dollar"></i> Selling Requests</a>
+                </li>
+                <li><a href="users.html"><i class="fa-solid fa-users"></i> Users Management</a></li>
+                <li><a href="gift_codes.html"><i class="fa-solid fa-gift"></i> Gift Codes</a></li>
+                <li><a href="banner.html"><i class="fa-solid fa-image"></i> Banners</a></li>
+                <li><a href="tutorial.html"><i class="fa-solid fa-graduation-cap"></i> Tutorials</a></li>
+                <li><a href="popups.html"><i class="fa-solid fa-window-maximize"></i> App Popups</a></li>
+                <li><a href="settings.html"><i class="fa-solid fa-gear"></i> App Settings</a></li>
+                <li><a href="../index.html" style="color: var(--danger); margin-top: 20px;"><i
+                            class="fa-solid fa-arrow-left"></i> Exit Admin</a></li>
+            </ul>
+        </aside>
+
+        <main class="content">
+            <h1>Payment Approvals</h1>
+
+            <table class="order-table" style="margin-top: 30px;">
+                <thead>
+                    <tr>
+                        <th>Date/Time</th>
+                        <th>User ID</th>
+                        <th>Amount</th>
+                        <th>UTR</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="paymentTableBody">
+                    <!-- Payments will be loaded here -->
+                </tbody>
+            </table>
+        </main>
+    </div>
+
+    <script type="module">
+        import { auth, db } from "./js/firebase.js";
+        import { collection, onSnapshot, doc, updateDoc, query, orderBy, getDoc, runTransaction, increment, addDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+        import { initPopup, showPopup } from "./js/utils.js";
+
+        initPopup();
+
+        // Admin Session Check
+        if (localStorage.getItem('adminSession') !== 'active') {
+            window.location.href = "login.html";
+        }
+
+        const paymentTableBody = document.getElementById('paymentTableBody');
+        const userCache = {}; // Local cache to reduce redundant reads
+
+        onSnapshot(query(collection(db, "payments"), orderBy("createdAt", "desc")), (snapshot) => {
+            paymentTableBody.innerHTML = '';
+            snapshot.forEach(docSnap => {
+                const pay = docSnap.data();
+                const tr = document.createElement('tr');
+                const date = pay.createdAt ? new Date(pay.createdAt).toLocaleString() : 'N/A';
+                tr.innerHTML = `
+                    <td style="font-size: 11px;">${date}</td>
+                    <td style="font-size: 11px;" id="userId_${docSnap.id}">${pay.userId}</td>
+                    <td style="font-weight: 700;">₹ ${pay.amount.toFixed(2)}</td>
+                    <td style="font-family: monospace;">${pay.utr}</td>
+                    <td><span style="color: ${pay.status === 'pending' ? '#F59E0B' : (pay.status === 'approved' ? 'var(--success)' : 'var(--danger)')}">${pay.status}</span></td>
+                    <td>
+                        ${pay.status === 'pending' ? `
+                            <button class="approve-btn" onclick="approvePayment('${docSnap.id}', '${pay.userId}', ${pay.amount})">Approve</button>
+                            <button class="decline-btn" onclick="declinePayment('${docSnap.id}')">Decline</button>
+                        ` : ''}
+                    </td>
+                `;
+                paymentTableBody.appendChild(tr);
+
+                // Check Cache first, else fetch
+                if (userCache[pay.userId]) {
+                    document.getElementById(`userId_${docSnap.id}`).textContent = userCache[pay.userId];
+                } else {
+                    getDoc(doc(db, "users", pay.userId)).then(uSnap => {
+                        if (uSnap.exists()) {
+                            const uData = uSnap.data();
+                            if (uData.userId) {
+                                userCache[pay.userId] = uData.userId;
+                                const el = document.getElementById(`userId_${docSnap.id}`);
+                                if (el) el.textContent = uData.userId;
+                            }
+                        }
+                    });
+                }
+            });
+        });
+
+        window.approvePayment = async (id, userUid, amount) => {
+            if (!confirm("Approve this payment and update user balance?")) return;
+
+            let userData = null;
+            try {
+                await runTransaction(db, async (transaction) => {
+                    const payRef = doc(db, "payments", id);
+                    const userRef = doc(db, "users", userUid);
+                    const settingsRef = doc(db, "settings", "app_settings");
+
+                    // 1. PERFORM ALL READS FIRST
+                    const payDoc = await transaction.get(payRef);
+                    if (!payDoc.exists() || payDoc.data().status !== 'pending') throw "Already processed";
+
+                    const userDoc = await transaction.get(userRef);
+                    if (!userDoc.exists()) throw "User not found";
+                    userData = userDoc.data();
+
+                    const settingsDoc = await transaction.get(settingsRef);
+                    const defaultRewardPercent = settingsDoc.exists() ? (settingsDoc.data().rewardPercent || 5.9) : 5.9;
+
+                    // Support for Referrer Read
+                    let referrerDoc = null;
+                    let l2ReferrerDoc = null;
+
+                    if (userData.referredBy) {
+                        referrerDoc = await transaction.get(doc(db, "users", userData.referredBy));
+                        if (referrerDoc.exists() && referrerDoc.data().referredBy) {
+                            l2ReferrerDoc = await transaction.get(doc(db, "users", referrerDoc.data().referredBy));
+                        }
+                    }
+
+                    // 2. CALCULATIONS
+                    const finalRewardPercent = (userData.rewardPercent !== undefined && userData.rewardPercent !== null) ? userData.rewardPercent : defaultRewardPercent;
+                    const rewardAmount = (amount * finalRewardPercent) / 100;
+                    const totalDiamonds = amount + rewardAmount;
+                    const currentBalance = userData.balance || 0;
+
+                    // 3. PERFORM ALL WRITES
+                    // Update payment status
+                    transaction.update(payRef, {
+                        status: 'approved',
+                        rewardAmount: rewardAmount,
+                        rewardPercent: finalRewardPercent
+                    });
+
+                    // Update user balance
+                    const updates = {
+                        balance: currentBalance + amount,
+                        diamonds: increment(totalDiamonds),
+                        "stats.totalDeposit": increment(1),
+                        "stats.todayDeposit": increment(1),
+                        "stats.todayPurchaseAmount": increment(amount),
+                        "stats.totalPurchaseAmount": increment(amount),
+                        "stats.totalRewardEarned": increment(rewardAmount)
+                    };
+
+                    // Check if this purchase satisfies the buy recharge requirement
+                    if (userData.buyRechargeRequired > 0 && amount >= userData.buyRechargeRequired) {
+                        updates.buyRechargeRequired = 0;
+                    }
+
+                    transaction.update(userRef, updates);
+
+                    // Level 1 Commission
+                    if (referrerDoc && referrerDoc.exists()) {
+                        const commission = (amount * 5) / 1000;
+                        transaction.update(referrerDoc.ref, {
+                            diamonds: increment(commission),
+                            "stats.todayCommission": increment(commission),
+                            "stats.totalCommission": increment(commission)
+                        });
+                    }
+
+                    // Level 2 Commission
+                    if (l2ReferrerDoc && l2ReferrerDoc.exists()) {
+                        const l2Commission = (amount * 1) / 1000;
+                        transaction.update(l2ReferrerDoc.ref, {
+                            diamonds: increment(l2Commission),
+                            "stats.todayCommission": increment(l2Commission),
+                            "stats.totalCommission": increment(l2Commission)
+                        });
+                    }
+                });
+
+                // 4. SEND NOTIFICATIONS (Outside transaction for simplicity or use transaction.set if needed)
+                // Notify User
+                await addDoc(collection(db, "users", userUid, "inbox"), {
+                    title: "Recharge Success",
+                    message: `Your recharge of ₹${amount} was approved. Diamond balance updated (+${(amount + (amount * (userData.rewardPercent || 0) / 100)).toFixed(2)}).`,
+                    timestamp: Date.now(),
+                    status: 'unread'
+                });
+
+                // Notify Level 1 Referrer
+                if (userData.referredBy) {
+                    const commission = (amount * 5) / 1000;
+                    await addDoc(collection(db, "users", userData.referredBy, "inbox"), {
+                        title: "Referral Commission",
+                        message: `You earned ₹${commission.toFixed(2)} commission from your referral's recharge.`,
+                        timestamp: Date.now(),
+                        status: 'unread'
+                    });
+                }
+
+                showPopup("Payment approved and commission paid!");
+            } catch (error) {
+                console.error(error);
+                showPopup("Error: " + error);
+            }
+        };
+
+        window.declinePayment = async (id) => {
+            if (confirm("Decline this payment?")) {
+                await updateDoc(doc(db, "payments", id), { status: 'declined' });
+            }
+        };
+    </script>
+</body>
+
+</html>
