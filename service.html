@@ -1,0 +1,143 @@
+<!-- service.html -->
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>XQ PAY - Customer Service</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        body {
+            background: #F8FAFC;
+        }
+
+        .service-card {
+            background: white;
+            border-radius: 20px;
+            padding: 40px 20px;
+            margin: 20px;
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+        }
+
+        .service-icon {
+            width: 100px;
+            height: 100px;
+            margin: 0 auto 20px;
+            border-radius: 50%;
+            overflow: hidden;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .service-icon img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .btn-tg {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            width: 100%;
+            padding: 16px;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 700;
+            color: white;
+            text-decoration: none;
+            margin-bottom: 15px;
+            transition: transform 0.2s;
+        }
+
+        .btn-tg:active {
+            transform: scale(0.98);
+        }
+
+        .btn-tg.support {
+            background: linear-gradient(135deg, #059669, #10B981);
+        }
+
+        .btn-tg.group {
+            background: linear-gradient(135deg, #047857, #10B981);
+        }
+    </style>
+</head>
+
+<body>
+    <header class="main-header">
+        <div class="logo-area" onclick="window.location.href='index.html'" style="cursor: pointer;">
+            <i class="fa-solid fa-chevron-left" style="font-size: 18px; margin-right: 5px;"></i>
+            <h1 class="app-name">Service</h1>
+        </div>
+        <div class="header-right">
+            <i class="fa-solid fa-headset"></i>
+        </div>
+    </header>
+
+    <div class="app-container">
+
+        <div class="service-card">
+            <div class="service-icon">
+                <img src="Fo.webp" alt="Customer Support">
+            </div>
+            <h2 style="font-size: 24px; font-weight: 800; margin-bottom: 10px; color: var(--text-dark);">Need Help?</h2>
+            <p style="color: var(--text-gray); font-size: 14px; margin-bottom: 30px; line-height: 1.6;">
+                Our support team is available on Telegram to help you with any issues or questions you may have.
+            </p>
+
+            <a href="#" id="tgSupportLink" class="btn-tg support">
+                <i class="fa-brands fa-telegram" style="font-size: 24px;"></i>
+                Contact Telegram Support
+            </a>
+
+            <a href="#" id="tgGroupLink" class="btn-tg group">
+                <i class="fa-solid fa-users-rectangle" style="font-size: 20px;"></i>
+                Join Telegram Group
+            </a>
+        </div>
+    </div>
+
+    <script type="module">
+        import { db } from "./js/firebase.js";
+        import { doc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+        async function loadLinks() {
+            function formatTgLink(input) {
+                if (!input) return "";
+                input = input.trim();
+                if (input.startsWith('http://') || input.startsWith('https://')) {
+                    return input;
+                }
+                if (input.startsWith('@')) {
+                    input = input.substring(1);
+                }
+                return `https://t.me/${input}`;
+            }
+
+            try {
+                const settingsSnap = await getDoc(doc(db, "settings", "app_settings"));
+                let supportHref = "https://t.me/XQ PAY_support";
+                let groupHref = "https://t.me/XQ PAY_group";
+
+                if (settingsSnap.exists()) {
+                    const data = settingsSnap.data();
+                    if (data.tgSupport) supportHref = formatTgLink(data.tgSupport);
+                    if (data.tgGroup) groupHref = formatTgLink(data.tgGroup);
+                }
+
+                document.getElementById('tgSupportLink').href = supportHref;
+                document.getElementById('tgGroupLink').href = groupHref;
+            } catch (error) {
+                console.error("Error loading links:", error);
+            }
+        }
+
+        loadLinks();
+    </script>
+</body>
+
+</html>
