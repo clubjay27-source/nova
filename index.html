@@ -1,0 +1,782 @@
+<!-- index.html -->
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>XQ PAY - Home</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#6C3EF4">
+</head>
+
+<body>
+    <!-- Global Splash Screen -->
+
+    <!-- TOP GREEN SITE HEADER BAR -->
+    <div style="background: linear-gradient(135deg, #10B981, #059669); position: sticky; top: 0; z-index: 2000;">
+
+        <!-- Logo Row: 999Pay + Download + Inbox -->
+        <div style="display: flex; align-items: center; justify-content: space-between; padding: 10px 18px 6px;">
+            <div style="display: flex; align-items: center; gap: 8px;">
+                <div
+                    style="background: white; border-radius: 8px; width: 30px; height: 30px; display: flex; align-items: center; justify-content: center;">
+                    <i class="fa-solid fa-coins" style="color: #10B981; font-size: 16px;"></i>
+                </div>
+                <span style="color: white; font-size: 18px; font-weight: 900; letter-spacing: 0.5px;">XQ PAY</span>
+            </div>
+            <div style="display: flex; gap: 18px; align-items: center;">
+                <!-- Inbox with red dot -->
+                <div style="position: relative; cursor: pointer;" onclick="window.location.href='inbox.html'">
+                    <i class="fa-solid fa-bell" style="color: white; font-size: 20px;"></i>
+                    <span id="inboxDot"
+                        style="display: none; position: absolute; top: -3px; right: -4px; width: 9px; height: 9px; background: #EF4444; border-radius: 50%; border: 1.5px solid white;"></span>
+                </div>
+                <!-- App Download -->
+                <div id="apkDownloadBtn"
+                    style="cursor: pointer; background: rgba(255,255,255,0.2); border-radius: 8px; padding: 4px 10px; display: flex; align-items: center; gap: 5px;"
+                    onclick="window.location.href=(this.dataset.url||'qxpay.apk')">
+                    <i class="fa-solid fa-cloud-arrow-down" style="color: white; font-size: 14px;"></i>
+                    <span style="color: white; font-size: 11px; font-weight: 700;">Download</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Marquee Ticker (admin changeable from Firebase) -->
+        <div style="background: rgba(0,0,0,0.18); padding: 5px 0; overflow: hidden; white-space: nowrap;">
+            <span id="tickerText"
+                style="display: inline-block; animation: marqueeScroll 22s linear infinite; color: white; font-size: 11px; font-weight: 600; padding-left: 100%;">
+                🔔 Don't get tricked easily — stay alert, stay safe! 🔒 &nbsp;&nbsp;&nbsp;&nbsp; 💰 Trade xCoin safely
+                with XQ PAY &nbsp;&nbsp;&nbsp;&nbsp; 📈 Earn daily profits — Buy &amp; Sell xCoin now!
+            </span>
+        </div>
+    </div>
+
+    <!-- Greeting Row (White bg, black text) -->
+    <div
+        style="background: white; padding: 12px 18px 6px; display: flex; align-items: center; justify-content: space-between;">
+        <h1 id="greetingName" style="color: #1E293B; font-size: 20px; font-weight: 800; margin: 0;">Hello, Loading...
+        </h1>
+        <div style="display: flex; gap: 14px; align-items: center;">
+            <i class="fa-solid fa-pen-to-square" onclick="window.location.href='personal_info.html'"
+                style="color: #64748B; font-size: 18px; cursor: pointer;"></i>
+            <i class="fa-solid fa-bell" onclick="window.location.href='inbox.html'"
+                style="color: #64748B; font-size: 18px; cursor: pointer; position: relative;"></i>
+            <div style="position: relative; cursor: pointer;" onclick="window.location.href='inbox.html'">
+                <i class="fa-solid fa-comment-dots" style="color: #10B981; font-size: 20px;"></i>
+                <span id="inboxDot2"
+                    style="display: none; position: absolute; top: -3px; right: -4px; width: 9px; height: 9px; background: #EF4444; border-radius: 50%; border: 1.5px solid white;"></span>
+            </div>
+        </div>
+    </div>
+
+    <div class="fixed-top-section" style="background: white;">
+        <!-- Balance Section (White Card) -->
+        <div style="padding: 16px 18px 8px; background: white;">
+            <p style="font-size: 12px; color: #94A3B8; font-weight: 600; margin: 0 0 4px;">xCoin Balance</p>
+            <div style="display: flex; align-items: center; justify-content: space-between;">
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <img src="coin.webp" style="width: 32px; height: 32px;">
+                    <span id="userBalance" style="font-size: 32px; font-weight: 800; color: #1E293B;">0.00</span>
+                </div>
+                <a href="bills.html"
+                    style="border: 1.5px solid #10B981; color: #10B981; padding: 5px 14px; border-radius: 20px; font-size: 12px; font-weight: 700; text-decoration: none;">Bill
+                    Details</a>
+            </div>
+        </div>
+
+        <!-- Stats Row -->
+        <div style="display: flex; gap: 10px; padding: 8px 18px 12px; background: white;">
+            <div style="flex: 1; background: #f0fdf4; border-radius: 12px; padding: 10px 14px;">
+                <p style="font-size: 11px; color: #64748B; margin: 0 0 6px; font-weight: 600;">Today orders</p>
+                <div style="display: flex; align-items: center; gap: 8px;">
+                    <i class="fa-solid fa-file-invoice" style="color: #10B981; font-size: 16px;"></i>
+                    <span id="todayOrderCount" style="font-size: 20px; font-weight: 800; color: #1E293B;">0</span>
+                </div>
+            </div>
+            <div style="flex: 1; background: #f0fdf4; border-radius: 12px; padding: 10px 14px;">
+                <p style="font-size: 11px; color: #64748B; margin: 0 0 6px; font-weight: 600;">Today profit <span
+                        style="font-size: 9px;">[estimated]</span></p>
+                <div style="display: flex; align-items: center; gap: 4px;">
+                    <span style="font-size: 13px; font-weight: 700; color: #1E293B;">Rs</span>
+                    <span id="todayProfit" style="font-size: 20px; font-weight: 800; color: #1E293B;">0.00</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Action Grid -->
+        <div class="action-grid"
+            style="margin-bottom: 0; padding-top: 10px; background: white; border-radius: 0 0 24px 24px; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);">
+            <a href="purchase.html" class="action-item">
+                <div class="action-icon-circle" style="background: #10B981;">
+                    <i class="fa-solid fa-cart-plus"></i>
+                </div>
+                <span style="color: #1E293B;">Buy</span>
+            </a>
+            <a href="tool.html" class="action-item">
+                <div class="action-icon-circle" style="background: #10B981;">
+                    <i class="fa-solid fa-arrow-up-from-bracket"></i>
+                </div>
+                <span style="color: #1E293B;">Sell</span>
+            </a>
+            <a href="tool.html" class="action-item">
+                <div class="action-icon-circle" style="background: #10B981;">
+                    <i class="fa-solid fa-wallet"></i>
+                </div>
+                <span style="color: #1E293B;">+UPI</span>
+            </a>
+            <a href="tool.html" class="action-item">
+                <div class="action-icon-circle" style="background: #10B981;">
+                    <i class="fa-solid fa-id-card"></i>
+                </div>
+                <span style="color: #1E293B;">Corporate</span>
+            </a>
+        </div>
+    </div>
+
+    <div class="app-container scrollable-content" style="padding-top: 16px;">
+
+        <!-- USDT Buy Section -->
+        <div class="home-section-header">
+            <div style="display: flex; align-items: center; gap: 6px; flex-wrap: wrap;">
+                <h2 style="font-size: 14px; font-weight: 800; color: #1E293B; margin: 0;">Buy xCoin use usdt</h2>
+                <a href="tutorials.html"
+                    style="font-size: 11px; color: #10B981; text-decoration: underline; font-weight: 600;">Click learn
+                    how to buy</a>
+            </div>
+            <a href="purchase.html?tab=usdt" class="go-link">GO <i class="fa-solid fa-chevron-right"></i></a>
+        </div>
+        <div class="profit-info-card">
+            <div style="display: flex; align-items: baseline; justify-content: center; gap: 8px; margin-bottom: 4px;">
+                <span class="profit-percentage" id="usdtRewardText">3.8%</span>
+                <span class="profit-text">profit per each order</span>
+            </div>
+            <div class="price-comparison">
+                <div class="price-box">
+                    <span class="price-label">Binance Price(Rs)</span>
+                    <span class="price-val" id="marketUsdtPrice">96.00</span>
+                </div>
+                <div class="price-box">
+                    <span class="price-label">Platform Price(Rs)</span>
+                    <span class="price-val" id="ourUsdtPrice">104.65</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- INR Buy Section -->
+        <div class="home-section-header">
+            <h2>Buy xCoin use rupee</h2>
+            <a href="purchase.html?tab=inr" class="go-link">GO <i class="fa-solid fa-chevron-right"></i></a>
+        </div>
+        <div class="profit-info-card" style="padding: 15px 20px;">
+            <div style="display: flex; align-items: baseline; justify-content: center; gap: 8px;">
+                <span class="profit-percentage" style="font-size: 26px;" id="rupeeRewardText">3.5%</span>
+                <span class="profit-text">profit per each order</span>
+            </div>
+        </div>
+
+        <!-- Corporate Card -->
+        <div class="home-section-header">
+            <h2>Upload Corporate Card</h2>
+            <a href="tool.html" class="go-link">GO <i class="fa-solid fa-chevron-right"></i></a>
+        </div>
+        <div class="profit-info-card" style="padding: 18px 20px; background: #F8FAFC;">
+            <span class="profit-text" style="font-size: 20px;">Earn <span
+                    style="color: #10B981; font-size: 26px; font-weight: 900; font-style: italic;">50K</span> every
+                day!</span>
+        </div>
+
+        <!-- Banner Removed -->
+    </div>
+
+    <!-- More Section -->
+    <div class="home-section-header" style="margin-top: -10px;">
+        <h2>More</h2>
+    </div>
+    <div class="more-grid" style="margin-bottom: 80px;">
+        <div class="more-card" onclick="window.location.href='tutorials.html'" style="cursor: pointer;">
+            <div>
+                <h3 style="font-size: 14px; font-weight: 800;">Learn</h3>
+                <p style="font-size: 10px; color: #94A3B8; margin-top: 5px;">New tutorials</p>
+                <p style="font-size: 10px; color: #EF4444; margin-top: 5px;">click for more</p>
+            </div>
+            <i class="fa-solid fa-book-open-reader" style="color: #10B981; font-size: 28px;"></i>
+        </div>
+        <div class="more-card" onclick="window.location.href='settings.html'" style="cursor: pointer;">
+            <div>
+                <h3 style="font-size: 14px; font-weight: 800;">Policy</h3>
+                <p style="font-size: 10px; color: #94A3B8; margin-top: 5px;">New rules</p>
+                <p style="font-size: 10px; color: #EF4444; margin-top: 5px;">click for more</p>
+            </div>
+            <i class="fa-solid fa-clipboard-list" style="color: #10B981; font-size: 28px;"></i>
+        </div>
+    </div>
+
+    <!-- Pending Buys Section -->
+    <div id="pendingBuysSection" style="padding: 0 16px; margin-bottom: 20px; display: none;">
+        <div class="section-header" style="padding: 0; margin-bottom: 12px;">
+            <h2 style="font-size: 16px;"><i class="fa-solid fa-clock-rotate-left"
+                    style="color: #f59e0b; margin-right: 8px;"></i>Pending Buys</h2>
+            <a href="buy_history.html?status=pending" class="see-all">History</a>
+        </div>
+        <div id="pendingList" style="display: flex; flex-direction: column; gap: 10px;"></div>
+    </div>
+
+    </div>
+
+    <!-- Bottom Navigation -->
+    <nav class="bottom-nav">
+        <a href="index.html" class="nav-item active">
+            <i class="fa-solid fa-building-columns"></i>
+            <span data-key="home">Home</span>
+        </a>
+        <a href="purchase.html" class="nav-item">
+            <i class="fa-solid fa-coins"></i>
+            <span data-key="purchase">Purchase</span>
+        </a>
+        <div class="tool-fab-container">
+            <a href="tool.html" class="tool-fab">
+                <i class="fa-solid fa-plus"></i>
+            </a>
+            <span style="font-size: 10px; font-weight: 700; color: var(--primary);">Tool</span>
+        </div>
+        <a href="team.html" class="nav-item">
+            <i class="fa-solid fa-chart-line"></i>
+            <span data-key="team">Team</span>
+        </a>
+        <a href="profile.html" class="nav-item">
+            <i class="fa-solid fa-user-tie"></i>
+            <span data-key="profile">Profile</span>
+        </a>
+    </nav>
+
+    <!-- Splash Screen (Loader) -->
+    <div class="loader-overlay splash-screen" id="loader">
+        <div class="splash-content">
+            <h1 class="splash-title-premium">XQ PAY</h1>
+        </div>
+    </div>
+
+    <!-- Popup Modal System -->
+    <div id="appPopupOverlay" class="popup-overlay" style="display: none;">
+        <div class="popup-content">
+            <img id="popupImg" src="" alt="Notification">
+            <button id="closePopupBtn" class="popup-close-btn">&times;</button>
+        </div>
+    </div>
+
+    <!-- Bonus Notification Popup -->
+    <div id="bonusPopup" class="popup-overlay" style="display: none; z-index: 10000;">
+        <div class="popup-content"
+            style="background: white; border-radius: 24px; padding: 30px; text-align: center; max-width: 320px; border: 2px solid #EC4899; box-shadow: 0 15px 50px rgba(0,0,0,0.1);">
+            <div
+                style="width: 80px; height: 80px; background: #FFF1F2; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; color: #EC4899; font-size: 36px; animation: bounce 2s infinite;">
+                <i class="fa-solid fa-gift"></i>
+            </div>
+            <h2 style="font-size: 22px; font-weight: 800; color: #1E293B; margin-bottom: 10px;">🎉 Bonus Alert!</h2>
+            <p style="color: #64748B; font-size: 14px; margin-bottom: 25px; line-height: 1.5; font-weight: 500;">You
+                have an unclaimed bonus of <b id="popupBonusAmt" style="color: #EC4899; font-size: 18px;">₹0.00</b>
+                waiting for you.</p>
+            <button id="goToProfileClaimBtn" class="btn-gradient"
+                style="width: 100%; height: 50px; background: linear-gradient(135deg, #EC4899, #D946EF); border-radius: 12px; font-weight: 800; font-size: 16px;">Claim
+                Now</button>
+            <button id="closeBonusPopBtn"
+                style="background: none; border: none; color: #94A3B8; font-weight: 600; font-size: 13px; margin-top: 15px; cursor: pointer;">Maybe
+                Later</button>
+        </div>
+    </div>
+
+    <!-- Floating Support Button -->
+    <div id="floatingSupport"
+        style="position: fixed; right: 20px; bottom: 100px; z-index: 5000; cursor: grab; touch-action: none; width: 60px; height: 60px; background: linear-gradient(135deg, #10B981, #059669); border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 8px 25px rgba(16, 185, 129, 0.4); border: 2.5px solid white;">
+        <i class="fa-solid fa-headset" style="color: white; font-size: 28px;"></i>
+    </div>
+
+    <style>
+        @keyframes marqueeScroll {
+            0% {
+                transform: translateX(0);
+            }
+
+            100% {
+                transform: translateX(-100%);
+            }
+        }
+
+        .app-container {
+            opacity: 0;
+            transition: opacity 0.5s ease;
+        }
+
+        .app-container.loaded {
+            opacity: 1;
+        }
+
+        .splash-screen {
+            background: #ffffff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            z-index: 99999;
+            position: fixed;
+            inset: 0;
+            transition: opacity 0.5s ease;
+        }
+
+        .splash-content {
+            text-align: center;
+            animation: fadeIn 0.8s ease-out;
+        }
+
+        .splash-title-premium {
+            font-size: 34px;
+            font-weight: 900;
+            color: #10B981;
+            letter-spacing: -2px;
+            animation: breathe 2.5s ease-in-out infinite, glow 2.5s ease-in-out infinite;
+            text-shadow: 0 0 10px rgba(16, 185, 129, 0.2);
+            font-family: 'Outfit', sans-serif;
+        }
+
+        @keyframes breathe {
+
+            0%,
+            100% {
+                transform: scale(1);
+                opacity: 0.8;
+            }
+
+            50% {
+                transform: scale(1.08);
+                opacity: 1;
+            }
+        }
+
+        @keyframes glow {
+
+            0%,
+            100% {
+                text-shadow: 0 0 15px rgba(16, 185, 129, 0.1);
+                color: #10B981;
+            }
+
+            50% {
+                text-shadow: 0 0 30px rgba(16, 185, 129, 0.6), 0 0 50px rgba(16, 185, 129, 0.3);
+                color: #059669;
+            }
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .popup-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 20000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 30px;
+        }
+
+        .popup-content {
+            position: relative;
+            max-width: 350px;
+            width: 100%;
+            animation: popupScale 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .popup-content img {
+            width: 100%;
+            border-radius: 20px;
+            cursor: pointer;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+        }
+
+        .popup-close-btn {
+            position: absolute;
+            bottom: -60px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 44px;
+            height: 44px;
+            background: white;
+            border: none;
+            border-radius: 50%;
+            font-size: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        }
+
+        @keyframes popupScale {
+            from {
+                transform: scale(0.8);
+                opacity: 0;
+            }
+
+            to {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        .pending-card {
+            background: white;
+            padding: 12px 16px;
+            border-radius: 12px;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.04);
+            border-left: 4px solid #f59e0b;
+            cursor: pointer;
+        }
+
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
+                opacity: 1;
+            }
+
+            50% {
+                transform: scale(1.2);
+                opacity: 0.7;
+            }
+
+            100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+    </style>
+
+    <script type="module">
+        import { auth, db } from "./js/firebase.js";
+        import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+        import {
+            doc, getDoc, updateDoc, collection, query, getDocs, orderBy, limit, where, onSnapshot, increment
+        } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        import { initPopup, showPopup } from "./js/utils.js";
+
+        initPopup();
+
+        const sellingToggle = document.getElementById('sellingToggle');
+        const userBalance = document.getElementById('userBalance');
+        const todayOrderCount = document.getElementById('todayOrderCount');
+        const todayProfit = document.getElementById('todayProfit');
+        const ourUsdtPrice = document.getElementById('ourUsdtPrice');
+        const marketUsdtPrice = document.getElementById('marketUsdtPrice');
+        const tutorialList = document.getElementById('tutorialList');
+        const bannerImg = document.getElementById('bannerImg');
+        const loader = document.getElementById('loader');
+        const greetingName = document.getElementById('greetingName');
+
+        // Function to show bonus popup
+        const showBonusPopup = (amt) => {
+            const pop = document.getElementById('bonusPopup');
+            const amtEl = document.getElementById('popupBonusAmt');
+            if (pop && amtEl) {
+                amtEl.textContent = `₹${amt.toFixed(2)}`;
+                pop.style.display = 'flex';
+
+                document.getElementById('goToProfileClaimBtn').onclick = () => {
+                    window.location.href = 'profile.html?action=claim_bonus';
+                };
+
+                document.getElementById('closeBonusPopBtn').onclick = () => {
+                    pop.style.display = 'none';
+                };
+            }
+        };
+
+        onAuthStateChanged(auth, async (user) => {
+            if (!user) { window.location.href = "login.html"; return; }
+
+            const userRef = doc(db, "users", user.uid);
+            onSnapshot(userRef, async (docSnap) => {
+                if (docSnap.exists()) {
+                    const data = docSnap.data();
+
+                    // Bonus Check
+                    if (data.bonus > 0 && !sessionStorage.getItem('bonusPopShown')) {
+                        showBonusPopup(data.bonus);
+                        sessionStorage.setItem('bonusPopShown', 'true');
+                    }
+                    if (data.isBlocked) {
+                        showPopup("Account blocked.");
+                        signOut(auth).then(() => window.location.href = "login.html");
+                        return;
+                    }
+                    const today = new Date().toISOString().split("T")[0];
+
+                    // Update New UI Elements
+                    if (userBalance) userBalance.textContent = (data.diamonds || 0).toFixed(2);
+                    // Masked mobile: 9876543210 -> 9876xxxx10
+                    if (greetingName) {
+                        const mob = data.mobile || "";
+                        let maskedMob = mob;
+                        if (mob.length >= 8) {
+                            maskedMob = mob.substring(0, 4) + "xxxx" + mob.substring(mob.length - 2);
+                        }
+                        greetingName.textContent = `Hello,${maskedMob}`;
+                    }
+
+                    // Inbox Unread Dot Logic
+                    onSnapshot(query(collection(db, "users", user.uid, "inbox"), where("status", "==", "unread")), (snap) => {
+                        const dot = document.getElementById("inboxDot");
+                        if (dot) dot.style.display = snap.empty ? 'none' : 'block';
+                    });
+
+                    // Personal Stats (Today Orders)
+                    onSnapshot(query(collection(db, "payments"), where("userId", "==", user.uid), where("date", "==", today)), (snap) => {
+                        let count = 0;
+                        snap.forEach(doc => {
+                            const d = doc.data();
+                            if (d.status === 'success' || d.status === 'approved') {
+                                count++;
+                            }
+                        });
+                        if (todayOrderCount) todayOrderCount.textContent = count;
+                    });
+
+                    // Combined Today Profit (Buys + Sells)
+                    const profitQuery = query(collection(db, "payments"), where("userId", "==", user.uid), where("date", "==", today));
+                    onSnapshot(profitQuery, (snap) => {
+                        let totalProfit = 0;
+                        snap.forEach(doc => {
+                            const d = doc.data();
+                            if (d.status === 'success' || d.status === 'approved') {
+                                totalProfit += (d.reward || 0);
+                            }
+                        });
+
+                        // Also add profit from selling_requests
+                        onSnapshot(query(collection(db, "selling_requests"), where("uid", "==", user.uid), where("date", "==", today)), (sellSnap) => {
+                            let sellProfit = 0;
+                            sellSnap.forEach(doc => {
+                                const d = doc.data();
+                                if (d.status === 'success' || d.status === 'approved') {
+                                    sellProfit += (d.reward || 0);
+                                }
+                            });
+
+                            const grandTotal = totalProfit + sellProfit;
+                            if (todayProfit) todayProfit.textContent = grandTotal.toFixed(2);
+                        });
+                    });
+
+                    // Pending Buys (20 mins)
+                    const limitTime = Date.now() - (20 * 60 * 1000);
+                    onSnapshot(query(collection(db, "payments"), where("userId", "==", user.uid), where("status", "==", "pending"), orderBy("createdAt", "desc")), (snap) => {
+                        const sec = document.getElementById("pendingBuysSection");
+                        const list = document.getElementById("pendingList");
+                        let html = '', count = 0;
+                        snap.forEach(doc => {
+                            const d = doc.data();
+                            if (d.createdAt < limitTime) return;
+                            count++;
+                            const statusLabel = d.status === 'pending' ? 'PROCESSING' : d.status.toUpperCase();
+                            html += `
+                                <div class="pending-card" onclick="window.location.href='payment.html?id=${d.orderId}&amount=${d.amount}&type=${d.type}'">
+                                    <div style="display:flex; align-items:center; gap:10px;">
+                                        <div style="width:8px; height:8px; background:#f59e0b; border-radius:50%; animation: pulse 1.5s infinite;"></div>
+                                        <div>
+                                            <div style="font-weight:700; font-size:14px;">₹${d.amount.toFixed(2)}</div>
+                                            <div style="font-size:10px; color:#f59e0b; font-weight:800; letter-spacing:0.5px;">${statusLabel}</div>
+                                        </div>
+                                    </div>
+                                    <div style="font-size:12px; color:var(--text-gray);">View Status <i class="fa-solid fa-chevron-right"></i></div>
+                                </div>
+                            `;
+                        });
+                        if (sec) sec.style.display = count > 0 ? 'block' : 'none';
+                        if (list) list.innerHTML = html;
+                    });
+
+                    // Popups only when logging in
+                    if (sessionStorage.getItem('justLoggedIn')) {
+                        sessionStorage.removeItem('justLoggedIn');
+                        loadPopups();
+                    }
+
+                    // Exit Splash & Reveal UI
+                    setTimeout(() => {
+                        if (loader) {
+                            loader.style.opacity = '0';
+                            document.querySelector('.app-container').classList.add('loaded');
+                            setTimeout(() => loader.style.display = 'none', 500);
+                        }
+                    }, 1500);
+                } else {
+                    // User exists in Auth but not in Firestore - maybe a generic error or cleanup
+                    console.error("User data not found in Firestore.");
+                    // Still hide loader so user can see something or log out
+                    setTimeout(() => {
+                        if (loader) {
+                            loader.style.opacity = '0';
+                            document.querySelector('.app-container').classList.add('loaded');
+                            setTimeout(() => loader.style.display = 'none', 500);
+                        }
+                    }, 1000);
+                }
+            });
+
+            // App Settings (reward %, prices, ticker text — all admin-controlled)
+            onSnapshot(doc(db, "settings", "app_settings"), (snap) => {
+                if (snap.exists()) {
+                    const d = snap.data();
+                    if (ourUsdtPrice) ourUsdtPrice.textContent = d.usdtPrice?.toFixed(2) || "104.25";
+                    if (marketUsdtPrice) marketUsdtPrice.textContent = d.marketPrice?.toFixed(2) || "96.00";
+
+                    const reward = (d.rewardPercent || 3.8).toFixed(1);
+                    if (document.getElementById('usdtRewardText')) document.getElementById('usdtRewardText').textContent = reward + "%";
+                    if (document.getElementById('rupeeRewardText')) document.getElementById('rupeeRewardText').textContent = (d.rewardPercentRupee || 3.5).toFixed(1) + "%";
+
+                    // Update ticker text from admin if set
+                    const ticker = document.getElementById('tickerText');
+                    if (ticker && d.tickerText) ticker.innerHTML = d.tickerText;
+
+                    // Update APK download URL
+                    const apkBtn = document.getElementById('apkDownloadBtn');
+                    if (apkBtn && d.apkUrl) apkBtn.dataset.url = d.apkUrl;
+                }
+            });
+        });
+
+        // Popup Logic
+        let queue = [];
+        async function loadPopups() {
+            sessionStorage.setItem('popupsShown', 'true');
+            const snap = await getDocs(query(collection(db, "popups"), orderBy("order", "asc")));
+            snap.forEach(d => queue.push({ id: d.id, ...d.data() }));
+            runQueue();
+        }
+        function runQueue() {
+            if (queue.length === 0) return;
+            const p = queue.shift();
+            const overlay = document.getElementById("appPopupOverlay");
+            const img = document.getElementById("popupImg");
+            img.src = p.image;
+            overlay.style.display = 'flex';
+            img.onclick = () => { if (p.url) window.location.href = p.url; };
+            const close = () => {
+                overlay.style.display = 'none';
+                runQueue();
+                document.getElementById("closePopupBtn").removeEventListener('click', close);
+                overlay.removeEventListener('click', ovClick);
+            };
+            const ovClick = (e) => { if (e.target === overlay) close(); };
+            document.getElementById("closePopupBtn").addEventListener('click', close);
+            overlay.addEventListener('click', ovClick);
+        }
+
+        // Tutorials Home
+        onSnapshot(collection(db, "tutorials"), (snap) => {
+            if (!tutorialList) return;
+            tutorialList.innerHTML = "";
+            let tuts = [];
+            snap.forEach(doc => tuts.push({ id: doc.id, ...doc.data() }));
+            tuts.sort((a, b) => (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0));
+            tuts.forEach(data => {
+                const targetUrl = data.link && data.link.startsWith('http') ? data.link : `tutorial_view.html?id=${data.id}`;
+                const targetAttr = data.link && data.link.startsWith('http') ? 'target="_blank"' : '';
+
+                tutorialList.innerHTML += `
+                    <div class="tutorial-card" style="background:white; padding:15px; border-radius:12px; margin-bottom:10px; display:flex; justify-content:space-between; align-items:center;">
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            <img src="DG.webp" style="width: 20px; height: 20px; object-fit: contain;">
+                            <span style="font-size:14px; font-weight:600;">${data.title}</span>
+                        </div>
+                        <a href="${targetUrl}" ${targetAttr} style="color:var(--primary); font-weight:700; text-decoration:none;">View</a>
+                    </div>
+                `;
+            });
+        });
+
+        onSnapshot(doc(db, "settings", "banner"), (snap) => {
+            if (snap.exists() && bannerImg) bannerImg.src = snap.data().image + "?t=" + Date.now();
+        });
+
+        // Drag Support
+        const sBtn = document.getElementById('floatingSupport');
+        if (sBtn) {
+            let active = false, startY, startB;
+            const start = (e) => {
+                active = false;
+                startY = (e.type === 'mousedown') ? e.clientY : e.touches[0].clientY;
+                startB = parseInt(window.getComputedStyle(sBtn).bottom);
+                document.addEventListener('mousemove', move);
+                document.addEventListener('touchmove', move, { passive: false });
+                document.addEventListener('mouseup', stop);
+                document.addEventListener('touchend', stop);
+            };
+            const move = (e) => {
+                active = true;
+                if (e.cancelable) e.preventDefault();
+                const currY = (e.type === 'mousemove') ? e.clientY : e.touches[0].clientY;
+                sBtn.style.bottom = Math.max(80, Math.min(window.innerHeight - 150, startB + (startY - currY))) + 'px';
+            };
+            const stop = () => {
+                document.removeEventListener('mousemove', move);
+                document.removeEventListener('touchmove', move);
+                document.removeEventListener('mouseup', stop);
+                document.removeEventListener('touchend', stop);
+                if (!active) window.location.href = 'service.html';
+            };
+            sBtn.addEventListener('mousedown', start);
+            sBtn.addEventListener('touchstart', start, { passive: true });
+        }
+        // FEATURE 1 & 4: Maintenance Mode / Quota Alert
+        async function checkQuotas() {
+            const today = new Date().toISOString().split("T")[0];
+            onSnapshot(doc(db, "system", "usage_stats", today, "data"), (snap) => {
+                if (snap.exists()) {
+                    const d = snap.data();
+                    const readLimit = 40000; // 80% of 50k
+                    const writeLimit = 16000; // 80% of 20k
+
+                    if ((d.reads || 0) > readLimit || (d.writes || 0) > writeLimit) {
+                        const overlay = document.createElement('div');
+                        overlay.id = "maintenanceOverlay";
+                        overlay.style = "position:fixed; inset:0; background:rgba(255,255,255,0.98); z-index:90000; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; padding:30px;";
+                        overlay.innerHTML = `
+                            <i class="fa-solid fa-gears" style="font-size:48px; color:var(--primary); margin-bottom:20px;"></i>
+                            <h2 style="font-size:24px; font-weight:800; color:#1E293B;">System under maintenance</h2>
+                            <p style="color:var(--text-gray); margin-top:10px;">We are currently optimizing our servers to handle high traffic. Please try again after 5 minutes.</p>
+                            <button onclick="location.reload()" style="margin-top:30px; background:var(--primary); color:white; border:none; padding:12px 30px; border-radius:10px; font-weight:700;">Refresh</button>
+                        `;
+                        if (!document.getElementById("maintenanceOverlay")) document.body.appendChild(overlay);
+                    }
+                }
+            });
+        }
+        checkQuotas();
+
+        // Integrate trackUsage into snapshots (Optional but helps estimate)
+        import("./js/utils.js").then(module => {
+            const track = module.trackUsage;
+            // Every time the home page loads stats, count as 1 read
+            track(db, "reads", 5); // Estimated for total snapshots on home page
+        });
+    </script>
+    <script type="module" src="js/lang.js"></script>
+    <script type="module" src="js/ticker.js"></script>
+</body>
+
+</html>
