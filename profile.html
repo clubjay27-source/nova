@@ -1,0 +1,711 @@
+<!-- profile.html -->
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>XQ PAY - Profile</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        .profile-header {
+            background: var(--gradient);
+            padding: 40px 20px 60px;
+            color: white;
+            text-align: center;
+            border-radius: 0 0 30px 30px;
+        }
+
+        .avatar {
+            width: 80px;
+            height: 80px;
+            background: white;
+            border-radius: 50%;
+            margin: 0 auto 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+            color: var(--primary);
+            font-weight: 700;
+        }
+
+        .balance-card {
+            background: white;
+            margin: -30px 20px 20px;
+            padding: 20px;
+            border-radius: 20px;
+            box-shadow: var(--shadow);
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            text-align: center;
+        }
+
+        .balance-item:first-child {
+            border-right: 1px solid #F3F4F6;
+        }
+
+        .balance-item .val {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--text-dark);
+            margin-bottom: 4px;
+        }
+
+        .balance-item .lab {
+            font-size: 12px;
+            color: var(--text-gray);
+        }
+
+        .menu-list {
+            padding: 0 20px;
+        }
+
+        .menu-item {
+            background: white;
+            padding: 16px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 12px;
+            cursor: pointer;
+            text-decoration: none;
+            color: var(--text-dark);
+        }
+
+        .menu-item .left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .menu-item i {
+            font-size: 18px;
+            color: var(--primary);
+        }
+
+        /* Language Popup Styles */
+        .lang-popup-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 5000;
+        }
+
+        .lang-popup {
+            background: white;
+            width: 80%;
+            max-width: 300px;
+            border-radius: 20px;
+            padding: 24px;
+            text-align: center;
+        }
+
+        .lang-option {
+            padding: 16px;
+            border-radius: 12px;
+            margin-bottom: 10px;
+            border: 1.5px solid #F1F5F9;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .lang-option:hover {
+            border-color: var(--primary);
+            background: #F5F3FF;
+        }
+
+        .lang-option.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+    </style>
+</head>
+
+<body>
+    <header class="main-header">
+        <div class="logo-area">
+            <i class="fa-solid fa-user-circle"></i>
+            <h1 class="app-name">Profile</h1>
+        </div>
+        <div class="header-right" onclick="window.location.href='settings.html'" style="cursor: pointer;">
+            <i class="fa-solid fa-gear"></i>
+        </div>
+    </header>
+
+    <div class="app-container">
+
+        <!-- New Profile Header -->
+        <div class="profile-header-new" onclick="window.location.href='personal_info.html'" style="cursor: pointer;">
+            <div style="display: flex; align-items: center; gap: 15px; padding: 20px 0;">
+                <img src="te.webp" class="avatar-img" id="avatarImg">
+                <div class="user-meta">
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                        <h2 id="maskedMobile" style="font-size: 18px; font-weight: 700;">Loading...</h2>
+                        <i class="fa-regular fa-copy" id="copyMobile"
+                            style="font-size: 14px; color: #64748B; cursor: pointer;"></i>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 8px; margin-top: 4px;">
+                        <span style="font-size: 13px; color: #64748B; font-weight: 600;">ID: <span
+                                id="displayUserId">------</span></span>
+                        <i class="fa-regular fa-copy" id="copyUserId"
+                            style="font-size: 12px; color: #64748B; cursor: pointer;"></i>
+                    </div>
+                </div>
+            </div>
+            <i class="fa-solid fa-chevron-right" style="color: #64748B;"></i>
+        </div>
+
+        <!-- Diamond Balance Card -->
+        <div class="balance-card-premium">
+            <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 8px;">
+                <img src="coin.webp" style="width: 24px; height: 24px;">
+                <span style="font-size: 14px; font-weight: 600; color: rgba(255,255,255,0.9);">Available Balance</span>
+            </div>
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <h1 style="font-size: 32px; font-weight: 800; margin: 0;">₹<span id="diamondBalance">0.00</span></h1>
+                <button class="detail-btn">Detail</button>
+            </div>
+            <div class="today-earnings">
+                <span data-key="today_earnings">Today's earnings</span>: <span id="todayEarnings">0.00</span>
+            </div>
+        </div>
+
+        <!-- Withdrawal Section -->
+        <div class="withdraw-section" onclick="window.location.href='withdraw.html'">
+            <div class="withdraw-header-row">
+                <div>
+                    <div class="withdraw-label-pill">
+                        <span data-key="withdrawal_in_transaction">Withdrawal(In transaction)</span>
+                    </div>
+                    <h2 id="pendingWithdraw" style="font-size: 30px; font-weight: 800; margin: 8px 0 0;">0.00</h2>
+                </div>
+                <button class="manage-btn"
+                    onclick="event.stopPropagation(); window.location.href='tool.html'">Manage</button>
+            </div>
+            <div class="withdraw-stats" style="margin-bottom: 15px;">
+                <div class="stat-box">
+                    <p class="stat-lab" data-key="today_withdraw">Today withdraw</p>
+                    <p class="stat-val" id="todayWithdraw">0.00</p>
+                </div>
+                <div class="stat-box">
+                    <p class="stat-lab" data-key="in_withdraw_upi_tool">In withdraw UPI tool</p>
+                    <p class="stat-val" id="upiToolCount">0</p>
+                </div>
+            </div>
+
+
+        </div>
+
+        <!-- Bonus Claim Section -->
+        <div class="bonus-claim-card"
+            style="background: white; margin: 0 20px 20px; padding: 18px; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.05); display: flex; align-items: center; justify-content: space-between; border: 1px solid #F1F5F9;">
+            <div style="display: flex; align-items: center; gap: 12px;">
+                <div
+                    style="width: 45px; height: 45px; background: #FEF3C7; border-radius: 12px; display: flex; align-items: center; justify-content: center; color: #D97706; font-size: 20px;">
+                    <i class="fa-solid fa-indian-rupee-sign"></i>
+                </div>
+                <div>
+                    <p style="font-size: 12px; color: #64748B; margin: 0; font-weight: 500;">Available Bonus</p>
+                    <h2 style="font-size: 20px; font-weight: 800; margin: 0; color: #1E293B;">₹<span
+                            id="bonusVal">0.00</span></h2>
+                </div>
+            </div>
+            <button id="claimBonusBtn"
+                style="background: linear-gradient(135deg, #10B981 0%, #059669 100%); color: white; border: none; padding: 10px 22px; border-radius: 12px; font-weight: 700; font-size: 14px; box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2); transition: all 0.2s;">Claim</button>
+        </div>
+
+        <!-- Main Grid Menu -->
+        <div class="menu-grid">
+            <a href="bills.html" class="grid-item">
+                <div class="icon-circle" style="background: #FFF7ED;">
+                    <img src="70.webp" alt="Bills">
+                </div>
+                <span data-key="bills">Bills</span>
+            </a>
+            <a href="buy_history.html" class="grid-item">
+                <div class="icon-circle" style="background: #F0FDF4;">
+                    <img src="gu.webp" alt="Buy">
+                </div>
+                <span data-key="buy">Buy</span>
+            </a>
+            <a href="sell_history.html" class="grid-item">
+                <div class="icon-circle" style="background: #F5F3FF;">
+                    <img src="DW.webp" alt="Sell">
+                </div>
+                <span data-key="sell">Sell</span>
+            </a>
+            <a href="service.html" id="supportLink" class="grid-item">
+                <div class="icon-circle" style="background: #FEF2F2;">
+                    <img src="xk.webp" alt="Service">
+                </div>
+                <span data-key="service">Service</span>
+            </a>
+        </div>
+
+        <!-- Other Functions -->
+        <div class="other-functions">
+            <h3 style="font-size: 16px; font-weight: 800; margin-bottom: 20px; padding: 0 10px;"
+                data-key="other_functions">Other functions</h3>
+            <div class="func-grid">
+                <div class="func-item" id="bonusBtn" onclick="window.location.href='bonus_history.html'">
+                    <img src="lT.webp" alt="Bonus">
+                    <span data-key="bonus">Bonus History</span>
+                </div>
+                <div class="func-item" id="redeemGiftBtn">
+                    <i class="fa-solid fa-gift" style="font-size: 24px; color: #EC4899;"></i>
+                    <span data-key="redeem">Redeem Gift</span>
+                </div>
+                <div class="func-item" id="inboxBtn" onclick="window.location.href='inbox.html'">
+                    <img src="YI.webp" alt="Inbox">
+                    <span data-key="inbox">Inbox</span>
+                </div>
+                <div class="func-item" id="passwordBtn" onclick="window.location.href='change_password.html'">
+                    <i class="fa-solid fa-lock" style="font-size: 24px; color: #1E293B;"></i>
+                    <span data-key="password">Password</span>
+                </div>
+                <div class="func-item">
+                    <i class="fa-solid fa-shield-halved" style="font-size: 24px; color: #1E293B;"></i>
+                    <span data-key="pin">Pin</span>
+                </div>
+                <div class="func-item" id="langBtn">
+                    <i class="fa-solid fa-globe" style="font-size: 24px; color: #1E293B;"></i>
+                    <span data-key="language">Language</span>
+                </div>
+                <div class="func-item" onclick="window.location.href='settings.html'">
+                    <i class="fa-solid fa-gear" style="font-size: 24px; color: #1E293B;"></i>
+                    <span data-key="settings">Settings</span>
+                </div>
+                <div class="func-item">
+                    <i class="fa-solid fa-circle-info" style="font-size: 24px; color: #10B981;"></i>
+                    <span style="font-weight: 600;">v 6.0.1.1</span>
+                </div>
+                <div class="func-item" onclick="window.location.href='XQPAY.apk'">
+                    <i class="fa-solid fa-cloud-arrow-down" style="font-size: 24px; color: #10B981;"></i>
+                    <span style="font-weight: 600;">App Download</span>
+                </div>
+                <div class="func-item" id="logoutBtn">
+                    <i class="fa-solid fa-right-from-bracket" style="font-size: 24px; color: #1E293B;"></i>
+                    <span data-key="logout">Log out</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Language Popup -->
+    <div class="lang-popup-overlay" id="langPopupOverlay">
+        <div class="lang-popup">
+            <h3 style="margin-bottom: 20px;" data-key="select_language">Select Language</h3>
+            <div class="lang-option active" onclick="setLang('en')">English</div>
+            <div class="lang-option" onclick="setLang('hi')">Hindi</div>
+            <button class="btn-gradient" style="margin-top: 20px; width: 100%;" id="closeLangBtn"
+                data-key="close">Close</button>
+        </div>
+    </div>
+
+    <!-- Redeem Gift Modal -->
+    <div id="redeemModal"
+        style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 2000; align-items: center; justify-content: center; padding: 20px;">
+        <div
+            style="background: white; padding: 30px 20px; border-radius: 20px; width: 100%; max-width: 350px; text-align: center; box-shadow: 0 10px 40px rgba(0,0,0,0.1);">
+            <i class="fa-solid fa-gift" style="font-size: 40px; color: #EC4899; margin-bottom: 15px;"></i>
+            <h3 style="margin: 0 0 15px; font-size: 20px; font-weight: 800; color: #1E293B;">Redeem Gift Code</h3>
+            <p style="font-size: 13px; color: #64748B; margin-bottom: 20px;">Enter your special code to instantly
+                receive diamonds.</p>
+            <input type="text" id="giftCodeInput" class="input-field" placeholder="Enter Gift Code"
+                style="margin-bottom: 20px; padding-left: 16px; text-transform: uppercase;">
+            <div style="display: flex; gap: 10px;">
+                <button class="btn-gradient" id="closeRedeemBtn"
+                    style="background: #F1F5F9; color: #64748B; flex: 1;">Cancel</button>
+                <button class="btn-gradient" id="confirmRedeemBtn"
+                    style="background: linear-gradient(135deg, #EC4899, #F43F5E); flex: 1;">Redeem</button>
+            </div>
+        </div>
+    </div>
+
+
+
+    <!-- Bottom Navigation -->
+    <nav class="bottom-nav">
+        <a href="index.html" class="nav-item">
+            <i class="fa-solid fa-building-columns"></i>
+            <span data-key="home">Home</span>
+        </a>
+        <a href="purchase.html" class="nav-item">
+            <i class="fa-solid fa-coins"></i>
+            <span data-key="purchase">Purchase</span>
+        </a>
+        <div class="tool-fab-container">
+            <a href="tool.html" class="tool-fab">
+                <i class="fa-solid fa-plus"></i>
+            </a>
+            <span style="font-size: 10px; font-weight: 700; color: var(--primary);">Tool</span>
+        </div>
+        <a href="team.html" class="nav-item">
+            <i class="fa-solid fa-chart-line"></i>
+            <span data-key="team">Team</span>
+        </a>
+        <a href="profile.html" class="nav-item active">
+            <i class="fa-solid fa-user-tie"></i>
+            <span data-key="profile">Profile</span>
+        </a>
+    </nav>
+
+    <script type="module">
+        import { auth, db } from "./js/firebase.js";
+        import { doc, onSnapshot, getDoc, collection, query, getDocs } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+        import { showPopup, copyToClipboard, initPopup } from "./js/utils.js";
+
+        initPopup();
+
+        onAuthStateChanged(auth, async (user) => {
+            if (!user) {
+                window.location.href = "login.html";
+                return;
+            }
+
+            const userRef = doc(db, "users", user.uid);
+            onSnapshot(userRef, (docSnap) => {
+                if (docSnap.exists()) {
+                    const data = docSnap.data();
+                    document.getElementById('diamondBalance').innerText = (data.diamonds || 0).toFixed(2);
+                    document.getElementById('bonusVal').innerText = (data.bonus || 0).toFixed(2);
+                    document.getElementById('todayEarnings').innerText = (data.stats?.todayRewardEarned || 0).toFixed(2);
+                    document.getElementById('pendingWithdraw').innerText = (data.stats?.pendingWithdraw || 0).toFixed(2);
+                    document.getElementById('todayWithdraw').innerText = (data.stats?.todayWithdraw || 0).toFixed(2);
+                    document.getElementById('upiToolCount').innerText = (data.upiToolCount || 0);
+
+                    const mob = data.mobile || "";
+                    if (mob.length >= 10) {
+                        document.getElementById('maskedMobile').innerText = mob.substring(0, 3) + "****" + mob.substring(7);
+                    } else {
+                        document.getElementById('maskedMobile').innerText = mob;
+                    }
+                    document.getElementById('displayUserId').innerText = data.userId || "------";
+                }
+            });
+
+            // Bonus claim logic
+            const claimBonus = async () => {
+                try {
+                    const userSnap = await getDoc(userRef);
+                    const data = userSnap.data();
+                    const bonus = data.bonus || 0;
+
+                    if (bonus <= 0) {
+                        showPopup("No bonus available to claim");
+                        return;
+                    }
+
+                    const claimTarget = data.bonusClaimRechargeTarget || 0;
+                    const currentPurchase = data.stats?.totalPurchaseAmount || 0;
+
+                    if (currentPurchase < claimTarget) {
+                        const needed = claimTarget - currentPurchase;
+                        showPopup(`Recharge of ₹${needed.toFixed(0)} more required to claim this bonus!`);
+                        return;
+                    }
+
+                    document.getElementById('claimBonusBtn').disabled = true;
+
+                    const { addDoc, serverTimestamp, updateDoc, increment } = await import("https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js");
+
+                    await updateDoc(userRef, {
+                        diamonds: increment(bonus),
+                        bonus: 0,
+                        buyRechargeRequired: increment(bonus / 2)
+                    });
+
+                    await addDoc(collection(db, "bonus_history"), {
+                        uid: user.uid,
+                        amount: bonus,
+                        timestamp: serverTimestamp()
+                    });
+
+                    // Success Popup with animation
+                    const successPopup = document.createElement('div');
+                    successPopup.style.cssText = `
+                        position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
+                        background: white; padding: 25px 40px; border-radius: 24px;
+                        z-index: 9999; display: flex; flex-direction: column; align-items: center; gap: 15px;
+                        box-shadow: 0 20px 60px rgba(0,0,0,0.15); animation: popupIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+                        border: 1px solid #F1F5F9;
+                    `;
+
+                    // Add keyframes to document if not exist
+                    if (!document.getElementById('popupAnim')) {
+                        const s = document.createElement('style');
+                        s.id = 'popupAnim';
+                        s.innerHTML = `
+                            @keyframes popupIn { from { transform: translate(-50%, -40%); opacity: 0; } to { transform: translate(-50%, -50%); opacity: 1; } }
+                            @keyframes checkBounce { 0% { transform: scale(0); } 50% { transform: scale(1.2); } 100% { transform: scale(1); } }
+                        `;
+                        document.head.appendChild(s);
+                    }
+
+                    successPopup.innerHTML = `
+                        <div style="width: 60px; height: 60px; background: #DCFCE7; border-radius: 50%; display: flex; align-items: center; justify-content: center; animation: checkBounce 0.5s ease 0.2s both;">
+                            <i class="fa-solid fa-circle-check" style="color: #10B981; font-size: 32px;"></i>
+                        </div>
+                        <div style="text-align: center;">
+                            <p style="color: #64748B; margin: 0; font-size: 14px; font-weight: 500;">Bonus Claimed!</p>
+                            <h2 style="margin: 5px 0 0; color: #1E293B; font-weight: 800; font-size: 24px;">₹${bonus.toFixed(2)}</h2>
+                        </div>
+                    `;
+                    document.body.appendChild(successPopup);
+
+                    setTimeout(() => {
+                        successPopup.style.transition = 'opacity 0.3s';
+                        successPopup.style.opacity = '0';
+                        setTimeout(() => successPopup.remove(), 300);
+                        document.getElementById('claimBonusBtn').disabled = false;
+                    }, 2000);
+                } catch (err) {
+                    showPopup("Claim failed");
+                    document.getElementById('claimBonusBtn').disabled = false;
+                }
+            };
+            document.getElementById('claimBonusBtn').onclick = claimBonus;
+
+            // Auto-trigger if redirected from home popup
+            if (new URLSearchParams(window.location.search).get('action') === 'claim_bonus') {
+                setTimeout(claimBonus, 1200);
+            }
+            onSnapshot(doc(db, "users", user.uid), async (docSnap) => {
+                if (docSnap.exists()) {
+                    const data = docSnap.data();
+
+                    if (data.isBlocked) {
+                        import("https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js").then(async (m) => {
+                            await m.signOut(auth);
+                            window.location.href = "login.html";
+                        });
+                        return;
+                    }
+
+                    // Migration: Ensure unique ID exists
+                    if (!data.userId) {
+                        const randomId = Math.floor(100000 + Math.random() * 900000).toString();
+                        const { updateDoc } = await import("https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js");
+                        await updateDoc(doc(db, "users", user.uid), { userId: randomId });
+                        data.userId = randomId;
+                    }
+
+                    // Mask Mobile: 9876543210 -> 98******10
+                    const mobile = data.mobile || "0000000000";
+                    const masked = (mobile.length > 4 ? mobile.substring(0, 2) + "******" + mobile.substring(mobile.length - 2) : mobile);
+                    document.getElementById('maskedMobile').textContent = masked;
+                    document.getElementById('displayUserId').textContent = data.userId || "------";
+
+                    document.getElementById('diamondBalance').textContent = parseFloat(data.diamonds || 0).toFixed(2);
+
+                    // Copy handlers
+                    const copyMob = (e) => { e.stopPropagation(); copyToClipboard(mobile, "Mobile copied!"); };
+                    const copyUid = (e) => { e.stopPropagation(); copyToClipboard(data.userId, "User ID copied!"); };
+
+                    document.getElementById('copyMobile').onclick = copyMob;
+                    document.getElementById('maskedMobile').onclick = copyMob;
+
+                    document.getElementById('copyUserId').onclick = copyUid;
+                    document.getElementById('displayUserId').onclick = copyUid;
+
+                    // Handle Redeem Modal
+                    const redeemModal = document.getElementById('redeemModal');
+                    const redeemBtn = document.getElementById('redeemGiftBtn');
+                    const closeRedeem = document.getElementById('closeRedeemBtn');
+
+                    if (redeemBtn) redeemBtn.onclick = () => redeemModal.style.display = 'flex';
+                    if (closeRedeem) closeRedeem.onclick = () => redeemModal.style.display = 'none';
+
+                    document.getElementById('confirmRedeemBtn').onclick = async () => {
+                        const code = document.getElementById('giftCodeInput').value.trim().toUpperCase();
+                        if (!code) return showPopup("Please enter a code");
+
+                        document.getElementById('confirmRedeemBtn').disabled = true;
+
+                        try {
+                            const { getDoc, doc, updateDoc, increment, arrayUnion } = await import("https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js");
+                            const giftRef = doc(db, "gift_codes", code);
+                            const giftSnap = await getDoc(giftRef);
+
+                            if (!giftSnap.exists()) {
+                                showPopup("Invalid Gift Code");
+                                document.getElementById('confirmRedeemBtn').disabled = false;
+                                return;
+                            }
+
+                            const giftData = giftSnap.data();
+
+                            // Validations
+                            if (giftData.status !== "active") {
+                                showPopup("This code is no longer active");
+                                document.getElementById('confirmRedeemBtn').disabled = false;
+                                return;
+                            }
+                            if (giftData.expiryDate && new Date() > new Date(giftData.expiryDate)) {
+                                showPopup("This code has expired");
+                                document.getElementById('confirmRedeemBtn').disabled = false;
+                                return;
+                            }
+                            if (giftData.specificUserId && giftData.specificUserId !== user.uid && giftData.specificUserId !== data.userId) {
+                                showPopup("This code is not for your account");
+                                document.getElementById('confirmRedeemBtn').disabled = false;
+                                return;
+                            }
+                            if (giftData.claimedBy && giftData.claimedBy.includes(user.uid)) {
+                                showPopup("You have already redeemed this code");
+                                document.getElementById('confirmRedeemBtn').disabled = false;
+                                return;
+                            }
+
+                            // Success!
+                            await updateDoc(userRef, {
+                                diamonds: increment(giftData.amount),
+                                "stats.totalDeposit": increment(1)
+                            });
+
+                            await updateDoc(giftRef, {
+                                claimedBy: arrayUnion(user.uid)
+                            });
+
+                            redeemModal.style.display = 'none';
+
+                            // Success Animation
+                            const successPopup = document.createElement('div');
+                            successPopup.style.cssText = `
+                                position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
+                                background: white; padding: 25px 40px; border-radius: 24px;
+                                z-index: 9999; display: flex; flex-direction: column; align-items: center; gap: 15px;
+                                box-shadow: 0 20px 60px rgba(0,0,0,0.15); animation: popupIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+                                border: 1px solid #F1F5F9;
+                            `;
+
+                            if (!document.getElementById('popupAnim')) {
+                                const s = document.createElement('style');
+                                s.id = 'popupAnim';
+                                s.innerHTML = `
+                                    @keyframes popupIn { from { transform: translate(-50%, -40%); opacity: 0; } to { transform: translate(-50%, -50%); opacity: 1; } }
+                                    @keyframes checkBounce { 0% { transform: scale(0); } 50% { transform: scale(1.2); } 100% { transform: scale(1); } }
+                                `;
+                                document.head.appendChild(s);
+                            }
+
+                            successPopup.innerHTML = `
+                                <div style="width: 60px; height: 60px; background: #DCFCE7; border-radius: 50%; display: flex; align-items: center; justify-content: center; animation: checkBounce 0.5s ease 0.2s both;">
+                                    <i class="fa-solid fa-circle-check" style="color: #10B981; font-size: 32px;"></i>
+                                </div>
+                                <div style="text-align: center;">
+                                    <p style="color: #64748B; margin: 0; font-size: 14px; font-weight: 500;">Congratulations!</p>
+                                    <h2 style="margin: 5px 0 0; color: #1E293B; font-weight: 800; font-size: 24px;">₹${giftData.amount.toFixed(2)}</h2>
+                                    <p style="color: #EC4899; margin: 5px 0 0; font-size: 12px; font-weight: 600;">Redeemed Gift</p>
+                                </div>
+                            `;
+                            document.body.appendChild(successPopup);
+
+                            setTimeout(() => {
+                                successPopup.style.transition = 'opacity 0.3s';
+                                successPopup.style.opacity = '0';
+                                setTimeout(() => successPopup.remove(), 300);
+                            }, 2500);
+
+                            document.getElementById('giftCodeInput').value = '';
+                        } catch (e) {
+                            showPopup("Error: " + e.message);
+                        } finally {
+                            document.getElementById('confirmRedeemBtn').disabled = false;
+                        }
+                    };
+                }
+            });
+
+            // Calculate Today's Earnings (Total reward earned from all orders purchased today)
+            const { where } = await import("https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js");
+            const todayStart = new Date();
+            todayStart.setHours(0, 0, 0, 0);
+            const todayMs = todayStart.getTime();
+
+            const qBuy = query(collection(db, "payments"), where("userId", "==", user.uid), where("status", "in", ["success", "approved"]));
+            onSnapshot(qBuy, (snap) => {
+                let totalReward = 0;
+                snap.forEach(doc => {
+                    const d = doc.data();
+                    if (d.createdAt >= todayMs) {
+                        totalReward += (d.reward || (d.amount * 0.059)); // fallback 5.9% if no reward set
+                    }
+                });
+                document.getElementById('todayEarnings').textContent = totalReward.toFixed(2);
+            });
+
+            // Fetch UPI tool count
+            const upiSnap = await getDocs(collection(db, "users", user.uid, "payment"));
+            document.getElementById('upiToolCount').textContent = upiSnap.size;
+
+            // Fetch pending buys count
+            onSnapshot(query(collection(db, "payments"), where("userId", "==", user.uid), where("status", "==", "pending")), (snap) => {
+                document.getElementById('pendingBuysCount').textContent = snap.size;
+            });
+
+            // Fetch today's total selling for (In transaction)
+            const todayStartAt = new Date();
+            todayStartAt.setHours(0, 0, 0, 0);
+            const todayStartMs = todayStartAt.getTime();
+
+            onSnapshot(query(collection(db, "selling_requests"), where("uid", "==", user.uid)), (snap) => {
+                let total = 0;
+                snap.forEach(doc => {
+                    const d = doc.data();
+                    if (d.timestamp >= todayStartMs) {
+                        total += (d.sellAmount || 0);
+                    }
+                });
+                const el = document.getElementById('pendingWithdraw');
+                if (el) el.textContent = total.toFixed(2);
+            });
+        });
+
+        // Logout
+        document.getElementById('logoutBtn').onclick = () => {
+            signOut(auth).then(() => window.location.href = "login.html");
+        };
+
+        // Language toggle
+        const langPopup = document.getElementById('langPopupOverlay');
+        const langBtn = document.getElementById('langBtn');
+        if (langBtn) {
+            langBtn.onclick = () => {
+                langPopup.style.display = 'flex';
+            };
+        }
+        document.getElementById('closeLangBtn').onclick = () => {
+            langPopup.style.display = 'none';
+        };
+
+        window.setLang = (lang) => {
+            localStorage.setItem('app_lang', lang);
+            showPopup(lang === 'hi' ? "Hindi language active" : "English language active");
+            setTimeout(() => window.location.reload(), 800);
+        };
+
+        // Initial set of active lang option
+        const currentLang = localStorage.getItem('app_lang') || 'en';
+        if (currentLang === 'hi') {
+            document.querySelectorAll('.lang-option')[0]?.classList.remove('active');
+            document.querySelectorAll('.lang-option')[1]?.classList.add('active');
+        }
+    </script>
+    <script type="module" src="js/lang.js"></script>
+    <script type="module" src="js/ticker.js"></script>
+</body>
+
+</html>

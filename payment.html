@@ -1,0 +1,492 @@
+<!-- payment.html -->
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>XQ PAY - Secure Checkout</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        :root {
+            --rzp-blue: #339af0;
+            --rzp-dark: #1E293B;
+            --rzp-gray: #64748B;
+            --rzp-bg: #F8FAFC;
+        }
+
+        body {
+            background: var(--rzp-bg);
+            font-family: 'Inter', 'Poppins', sans-serif;
+            margin: 0;
+            color: var(--rzp-dark);
+        }
+
+        .header-slim {
+            background: white;
+            padding: 12px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #E2E8F0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-slim .logo {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 800;
+            font-size: 16px;
+            color: var(--rzp-blue);
+        }
+
+        .timer-badge {
+            background: #FFF5F5;
+            color: #E53E3E;
+            padding: 4px 12px;
+            border-radius: 50px;
+            font-size: 13px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .payment-card {
+            background: white;
+            margin: 16px;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+            overflow: hidden;
+            border: 1px solid #E2E8F0;
+        }
+
+        .amount-section {
+            padding: 24px;
+            text-align: center;
+            background: #F1F5F9;
+            border-bottom: 1px dashed #CBD5E1;
+        }
+
+        .amount-label {
+            font-size: 12px;
+            color: var(--rzp-gray);
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 8px;
+        }
+
+        .amount-value {
+            font-size: 32px;
+            font-weight: 800;
+            color: var(--rzp-dark);
+        }
+
+        .upi-info {
+            padding: 20px;
+        }
+
+        .info-group {
+            margin-bottom: 20px;
+        }
+
+        .info-label {
+            font-size: 11px;
+            color: var(--rzp-gray);
+            font-weight: 700;
+            text-transform: uppercase;
+            margin-bottom: 8px;
+            display: block;
+        }
+
+        .info-box {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #F8FAFC;
+            padding: 12px 16px;
+            border-radius: 8px;
+            border: 1px solid #E2E8F0;
+        }
+
+        .info-text {
+            font-weight: 700;
+            font-size: 14px;
+            color: var(--rzp-dark);
+        }
+
+        .copy-btn {
+            color: var(--rzp-blue);
+            cursor: pointer;
+            font-size: 18px;
+        }
+
+        .qr-area {
+            text-align: center;
+            padding: 20px;
+            background: white;
+        }
+
+        .qr-frame {
+            padding: 12px;
+            background: white;
+            display: inline-block;
+            border-radius: 12px;
+            border: 1.5px solid #F1F5F9;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+            margin-bottom: 12px;
+        }
+
+        .qr-frame img {
+            width: 150px;
+            height: 150px;
+            display: block;
+        }
+
+        .action-container {
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .btn-pay-app {
+            background: var(--rzp-blue);
+            color: white;
+            border: none;
+            height: 50px;
+            border-radius: 8px;
+            font-size: 15px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            cursor: pointer;
+            transition: opacity 0.2s;
+        }
+
+        .utr-input-box {
+            border: 1.5px solid #E2E8F0;
+            border-radius: 8px;
+            padding: 0 16px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: white;
+        }
+
+        .utr-input-box input {
+            border: none;
+            outline: none;
+            width: 100%;
+            font-size: 15px;
+            font-weight: 600;
+            letter-spacing: 1px;
+        }
+
+        .btn-submit {
+            background: var(--rzp-dark);
+            color: white;
+            border: none;
+            height: 50px;
+            border-radius: 8px;
+            font-size: 15px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .footer-secure {
+            text-align: center;
+            padding: 20px;
+            color: var(--rzp-gray);
+            font-size: 11px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="header-slim">
+        <div class="logo">
+            <i class="fa-solid fa-shield-halved"></i> 999 PAY SECURE
+        </div>
+        <div class="timer-badge">
+            <i class="fa-regular fa-clock"></i> <span id="timer">20:00</span>
+        </div>
+    </div>
+
+    <div class="app-container" style="max-width: 500px; margin: 0 auto; padding-bottom: 40px;">
+        <div class="payment-card">
+            <div class="amount-section">
+                <p class="amount-label">Amount to Pay</p>
+                <h1 class="amount-value" id="amtDisplay">₹ 0.00</h1>
+            </div>
+
+            <div class="upi-info">
+                <div class="info-group">
+                    <label class="info-label">Merchant UPI ID</label>
+                    <div class="info-box">
+                        <span class="info-text" id="upiId">loading...</span>
+                        <i class="fa-regular fa-copy copy-btn" id="copyUpi"></i>
+                    </div>
+                </div>
+
+                <div class="info-group" id="userUpiSection">
+                    <label class="info-label">Pay From</label>
+                    <div class="info-box" style="background: #EEF2FF; border-color: #C7D2FE;">
+                        <span class="info-text" id="selectedUserUpi" style="color: var(--rzp-blue);">None</span>
+                        <i class="fa-solid fa-wallet" style="color: var(--rzp-blue);"></i>
+                    </div>
+                </div>
+
+                <div class="qr-area" id="qrContainer" style="display: none;">
+                    <div class="qr-frame">
+                        <img src="" alt="QR Code" id="qrImg">
+                    </div>
+                    <p style="font-size: 12px; color: var(--rzp-gray); font-weight: 600;">Scan with any app to pay</p>
+                </div>
+            </div>
+
+            <div class="action-container">
+                <button class="btn-pay-app" id="goPayBtn">
+                    <i class="fa-solid fa-bolt"></i> Pay with App
+                </button>
+
+                <div style="text-align: center; margin: 10px 0; display: flex; align-items: center; gap: 10px;">
+                    <hr style="flex:1; border:0; border-top:1px solid #E2E8F0;">
+                    <span style="font-size: 12px; color: var(--rzp-gray); font-weight: 600;">OR SUBMIT UTR</span>
+                    <hr style="flex:1; border:0; border-top:1px solid #E2E8F0;">
+                </div>
+
+                <div class="utr-input-box">
+                    <i class="fa-solid fa-hashtag" style="color: var(--rzp-gray);"></i>
+                    <input type="tel" id="utrInput" placeholder="12-digit UTR (Ref) Number" maxlength="12"
+                        oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0, 12)">
+                </div>
+
+                <button class="btn-submit" id="submitPayment">Submit Payment Details</button>
+            </div>
+        </div>
+
+        <div class="footer-secure">
+            <i class="fa-solid fa-lock"></i> SECURE 256-BIT ENCRYPTED PAYMENT
+        </div>
+    </div>
+
+    <div class="loader-overlay" id="loader">
+        <div class="spinner"></div>
+    </div>
+
+    <script type="module">
+        import { auth, db } from "./js/firebase.js";
+        import { collection, addDoc, doc, getDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+        import { initPopup, showPopup, copyToClipboard } from "./js/utils.js";
+
+        initPopup();
+
+        const urlParams = new URLSearchParams(window.location.search);
+        const orderId = urlParams.get('id');
+        const amount = parseFloat(urlParams.get('amount')) || 0;
+        const orderType = urlParams.get('type') || 'INR';
+        const userUpi = urlParams.get('upi') || '';
+        const platform = urlParams.get('platform') || '';
+
+        const amtDisplay = document.getElementById('amtDisplay');
+        const upiIdSpan = document.getElementById('upiId');
+        const userUpiSpan = document.getElementById('selectedUserUpi');
+        const qrContainer = document.getElementById('qrContainer');
+        const qrImg = document.getElementById('qrImg');
+        const timerText = document.getElementById('timer');
+        const utrInput = document.getElementById('utrInput');
+        const submitBtn = document.getElementById('submitPayment');
+        const goPayBtn = document.getElementById('goPayBtn');
+        const loader = document.getElementById('loader');
+
+        amtDisplay.textContent = `₹ ${amount.toFixed(2)}`;
+        if (userUpi) {
+            userUpiSpan.textContent = `${platform ? platform + ' - ' : ''}${userUpi}`;
+        }
+
+        // Timer Logic
+        let time = 1200;
+        const interval = setInterval(() => {
+            time--;
+            let mins = Math.floor(time / 60);
+            let secs = time % 60;
+            timerText.textContent = `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+            if (time <= 0) {
+                clearInterval(interval);
+                showPopup("Payment time expired!");
+                setTimeout(() => window.location.href = "purchase.html", 2000);
+            }
+        }, 1000);
+
+        // Load admin upi & Dynamic QR
+        async function loadPaymentDetails(user) {
+            const settingsSnap = await getDoc(doc(db, "settings", "app_settings"));
+            let upis = ["xqpay@ybl"];
+
+            if (settingsSnap.exists()) {
+                const s = settingsSnap.data();
+                if (s.paymentUpi1) upis.push(s.paymentUpi1);
+                if (s.paymentUpi2) upis.push(s.paymentUpi2);
+                if (s.paymentUpi3) upis.push(s.paymentUpi3);
+                if (upis.length > 1) upis = upis.filter(u => u !== "xqpay@ybl");
+            }
+
+            const chosenUpi = upis[Math.floor(Math.random() * upis.length)];
+            upiIdSpan.textContent = chosenUpi;
+
+            if (user) {
+                const userSnap = await getDoc(doc(db, "users", user.uid));
+                if (userSnap.exists()) {
+                    const uData = userSnap.data();
+                    if (uData.specialPaymentImage) {
+                        qrContainer.style.display = 'block';
+                        qrImg.src = uData.specialPaymentImage;
+                        return; // Special image overrides everything
+                    }
+                }
+            }
+
+            qrContainer.style.display = 'block';
+            const qrData = `upi://pay?pa=${chosenUpi}&pn=999%20Pay&am=${amount.toFixed(2)}&cu=INR`;
+            qrImg.src = `https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=${encodeURIComponent(qrData)}`;
+        }
+
+        // Copy upi
+        document.getElementById('copyUpi').addEventListener('click', () => {
+            if (upiIdSpan.textContent === 'loading...') return;
+            copyToClipboard(upiIdSpan.textContent, "Admin UPI copied!");
+        });
+
+        // Go Pay Button
+        goPayBtn.addEventListener('click', () => {
+            const upi = upiIdSpan.textContent;
+            if (!upi || upi === 'loading...') {
+                showPopup("Loading payment details...");
+                return;
+            }
+            const upiUrl = `upi://pay?pa=${upi}&pn=XQ PAY&am=${amount.toFixed(2)}&cu=INR`;
+            window.location.href = upiUrl;
+        });
+
+        // Submit Logic
+        submitBtn.addEventListener('click', async () => {
+            const utr = utrInput.value.trim();
+            if (utr.length !== 12) { showPopup("Please enter a valid 12-digit UTR ID"); return; }
+
+            const user = auth.currentUser;
+            if (!user) return;
+
+            if (loader) loader.style.display = 'flex';
+            try {
+                const { getDocs, query, where, collection } = await import("https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js");
+
+                // 1. Check for Duplicate UTR
+                const q = query(collection(db, "payments"), where("utr", "==", utr));
+                const snap = await getDocs(q);
+
+                if (!snap.empty) {
+                    showPopup("This UTR has already been submitted!");
+                    if (loader) loader.style.display = 'none';
+                    return;
+                }
+
+                const reward = parseFloat(urlParams.get('reward')) || 0;
+
+                // 2. Submit New Payment
+                const docRef = await addDoc(collection(db, "payments"), {
+                    userId: user.uid,
+                    orderId: orderId || 'DIRECT',
+                    amount: amount,
+                    reward: reward, // Saved reward
+                    utr: utr,
+                    type: orderType,
+                    userUpi: userUpi,
+                    status: "pending",
+                    createdAt: Date.now(),
+                    date: new Date().toISOString().split("T")[0]
+                });
+
+                // Add Inbox Notification
+                await addDoc(collection(db, "users", user.uid, "inbox"), {
+                    title: "Payment Submitted",
+                    message: `UTR: ${utr} for ₹${amount.toFixed(2)} is under verification.`,
+                    timestamp: Date.now(),
+                    status: 'unread'
+                });
+
+                showProcessingUI(utr, docRef.id);
+            } catch (e) {
+                showPopup("Error: " + e.message);
+                if (loader) loader.style.display = 'none';
+            }
+        });
+
+        function showProcessingUI(utr, docId) {
+            clearInterval(interval);
+            const container = document.querySelector('.app-container');
+            container.innerHTML = `
+                <div style="height: 80vh; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 24px;">
+                    <div style="width: 80px; height: 80px; border: 8px solid #F3F4F6; border-top: 8px solid var(--rzp-blue); border-radius: 50%; animation: spin 1s linear infinite; margin-bottom: 24px;"></div>
+                    <h1 style="font-size: 24px; font-weight: 800; color: var(--rzp-dark); margin-bottom: 12px;">Payment Pending</h1>
+                    <p style="color: var(--rzp-gray); font-size: 14px; margin-bottom: 32px; line-height: 1.6;">Verifying your payment UTR: ${utr}<br>Please do not close this page.</p>
+                    <button onclick="window.location.href='index.html'" style="border: none; background: var(--rzp-blue); color: white; padding: 14px 40px; border-radius: 8px; font-weight: 700; cursor: pointer;">Return Home</button>
+                </div>
+            `;
+
+            const style = document.createElement('style');
+            style.innerHTML = `@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }`;
+            document.head.appendChild(style);
+
+            onSnapshot(doc(db, "payments", docId), (snap) => {
+                if (snap.exists() && (snap.data().status === 'success' || snap.data().status === 'approved')) {
+                    container.innerHTML = `
+                        <div style="height: 80vh; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 24px;">
+                            <i class="fa-solid fa-circle-check" style="font-size: 80px; color: #10B981; margin-bottom: 24px;"></i>
+                            <h1 style="font-size: 32px; font-weight: 800; color: #10B981; margin-bottom: 12px;">PAYMENT SUCCESS</h1>
+                            <p style="color: var(--rzp-gray); font-size: 15px;">Amount: ₹${amount.toFixed(2)}<br>UTR: ${utr}</p>
+                            <p style="margin-top: 15px; color: var(--rzp-blue); font-weight: 600;">Redirecting to profile in 2 seconds...</p>
+                            <button onclick="window.location.href='profile.html'" style="margin-top: 25px; border: none; background: #10B981; color: white; padding: 14px 40px; border-radius: 8px; font-weight: 700; cursor: pointer;">Go to Profile</button>
+                        </div>
+                    `;
+                    setTimeout(() => {
+                        window.location.href = "profile.html";
+                    }, 2000);
+                }
+            });
+        }
+
+        async function checkExitingPayment(user) {
+            const { getDocs, query, where, collection } = await import("https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js");
+            const q = query(collection(db, "payments"), where("userId", "==", user.uid), where("orderId", "==", orderId), where("status", "==", "pending"));
+            const snap = await getDocs(q);
+            if (!snap.empty) showProcessingUI(snap.docs[0].data().utr, snap.docs[0].id);
+        }
+
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                if (orderId) checkExitingPayment(user);
+                loadPaymentDetails(user);
+            } else {
+                window.location.href = "login.html";
+            }
+        });
+    </script>
+    <script type="module" src="js/ticker.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,626 @@
+<!-- purchase.html -->
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>XQ PAY - Purchase</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#6C3EF4">
+    <style>
+        :root {
+            --primary: #10B981;
+            --secondary: #059669;
+            --gradient: linear-gradient(135deg, #10B981, #059669);
+            --bg: #F5F7FF;
+            --text-dark: #1E1B4B;
+            --text-gray: #6B7280;
+        }
+
+        body {
+            background: var(--bg);
+            font-family: 'Poppins', sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
+        /* Tabs */
+        .tab-bar {
+            background: white;
+            display: flex;
+            justify-content: space-around;
+            padding: 10px 0;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .tab {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text-gray);
+            cursor: pointer;
+            padding: 8px 16px;
+            position: relative;
+        }
+
+        .tab.active {
+            color: var(--text-dark);
+        }
+
+        /* UPI Selection Popup Overlay */
+        .popup-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+        }
+
+        .select-tool-popup {
+            background: white;
+            border-radius: 24px;
+            width: 90%;
+            max-width: 400px;
+            overflow: hidden;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+            padding: 24px;
+            text-align: center;
+        }
+
+        .select-tool-header {
+            font-size: 20px;
+            font-weight: 800;
+            color: #1E293B;
+            margin-bottom: 24px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #F1F5F9;
+        }
+
+        .upi-selection-list {
+            margin-bottom: 20px;
+        }
+
+        .upi-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: #F8FAFC;
+            padding: 16px;
+            border-radius: 16px;
+            margin-bottom: 12px;
+            cursor: pointer;
+            border: 2px solid transparent;
+            transition: .2s;
+        }
+
+        .upi-item.selected {
+            border-color: var(--primary);
+            background: #F5F3FF;
+        }
+
+        .upi-item-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .upi-app-logo {
+            width: 40px;
+            height: 40px;
+            object-fit: contain;
+        }
+
+        .upi-id-info {
+            text-align: left;
+        }
+
+        .upi-app-name {
+            font-weight: 700;
+            font-size: 15px;
+            color: #1E293B;
+        }
+
+        .upi-id-label {
+            font-size: 12px;
+            color: #64748B;
+        }
+
+        .radio-circle {
+            width: 20px;
+            height: 20px;
+            border: 2px solid #CBD5E1;
+            border-radius: 50%;
+        }
+
+        .upi-item.selected .radio-circle {
+            border-color: var(--primary);
+            background: var(--primary);
+            box-shadow: inset 0 0 0 3px white;
+        }
+
+        .warning-text {
+            color: #EF4444;
+            font-size: 11px;
+            line-height: 1.6;
+            text-align: left;
+            margin: 20px 0;
+            padding-top: 10px;
+            border-top: 1px solid #F1F5F9;
+            font-weight: 600;
+        }
+
+        .popup-actions {
+            display: flex;
+            gap: 12px;
+            border-top: 1px solid #F1F5F9;
+            padding-top: 20px;
+        }
+
+        .btn-popup {
+            flex: 1;
+            height: 48px;
+            border-radius: 12px;
+            font-weight: 700;
+            cursor: pointer;
+            border: none;
+        }
+
+        .btn-cancel {
+            background: transparent;
+            color: #64748B;
+        }
+
+        .btn-confirm {
+            background: transparent;
+            color: #10B981;
+        }
+
+        .tab.active::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 30px;
+            height: 4px;
+            background: var(--primary);
+            border-radius: 4px;
+        }
+
+
+        /* Filter Row */
+        .filter-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 0 16px 16px;
+        }
+
+        .input-box {
+            background: white;
+            border: 1.5px solid #E5E7EB;
+            border-radius: 10px;
+            padding: 10px;
+            width: 80px;
+            text-align: center;
+            font-weight: 600;
+            color: var(--text-dark);
+        }
+
+        .separator {
+            width: 15px;
+            height: 2px;
+            background: #000;
+        }
+
+        .action-btn {
+            border: none;
+            border-radius: 10px;
+            padding: 10px 20px;
+            font-weight: 700;
+            color: white;
+            cursor: pointer;
+            font-size: 14px;
+            flex: 1;
+        }
+
+        .btn-go {
+            background: #6C5CE7;
+        }
+
+        .btn-reset {
+            background: #5E72E4;
+        }
+
+        /* Order Card */
+        .order-card-new {
+            background: white;
+            margin: 0 auto 12px;
+            padding: 12px 20px;
+            border-radius: 20px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.03);
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            width: 380px;
+            height: 135px;
+            justify-content: center;
+        }
+
+        .card-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .amt-group {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .icon-circle {
+            width: 36px;
+            height: 36px;
+            background: #F0F4FF;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--primary);
+            font-size: 16px;
+        }
+
+        .amt-val {
+            font-size: 16px;
+            font-weight: 800;
+            color: var(--text-dark);
+        }
+
+        .bank-badge {
+            background: #F3F4F6;
+            color: var(--primary);
+            font-size: 10px;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-weight: 700;
+            margin-top: 4px;
+            display: inline-block;
+        }
+
+        .type-tab.active {
+            background: #10B981;
+            color: white !important;
+        }
+
+        .range-pill {
+            padding: 6px 16px;
+            border-radius: 20px;
+            background: #E5E7EB;
+            color: #64748B;
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .range-pill.active {
+            background: #10B981;
+            color: white;
+            box-shadow: 0 4px 10px rgba(16, 185, 129, 0.3);
+        }
+
+        /* Redesigned Order Card */
+        .order-card-new {
+            background: white;
+            margin: 0 20px 10px;
+            padding: 12px 18px;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            border: 1px solid #F1F5F9;
+        }
+
+        .card-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .amt-group {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .icon-circle {
+            width: 32px;
+            height: 32px;
+            background: #10B981;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 16px;
+        }
+
+        .amt-val {
+            font-size: 18px;
+            font-weight: 700;
+            color: #1E293B;
+        }
+
+        .currency-label {
+            font-size: 14px;
+            color: #94A3B8;
+            margin-left: 5px;
+        }
+
+        .btn-buy {
+            background: #10B981;
+            color: white;
+            border: none;
+            padding: 6px 20px;
+            border-radius: 50px;
+            font-weight: 700;
+            font-size: 13px;
+            cursor: pointer;
+        }
+
+        .card-bottom {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .info-col {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .label-text {
+            font-size: 13px;
+            color: #64748B;
+            font-weight: 500;
+        }
+
+        .val-row {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 15px;
+            font-weight: 700;
+            color: #1E293B;
+        }
+
+        .formula {
+            font-size: 12px;
+            color: #10B981;
+            font-weight: 600;
+        }
+
+        .coin-img {
+            width: 22px;
+            height: 22px;
+            object-fit: contain;
+        }
+
+        .wallet-val {
+            font-size: 18px;
+            color: #1E293B;
+            font-weight: 700;
+        }
+
+        /* Bottom Nav */
+        .bottom-nav {
+            background: white;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            padding: 10px 0;
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            max-width: 480px;
+            left: 50%;
+            transform: translateX(-50%);
+            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.05);
+            z-index: 1000;
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-decoration: none;
+            color: #94A3B8;
+            font-size: 11px;
+            gap: 4px;
+            flex: 1;
+        }
+
+        .nav-item.active {
+            color: #10B981;
+        }
+
+        .nav-item i {
+            font-size: 20px;
+        }
+
+        .tool-fab-container {
+            position: relative;
+            top: -20px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .tool-fab {
+            width: 55px;
+            height: 55px;
+            background: #10B981;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 24px;
+            box-shadow: 0 4px 15px rgba(16, 185, 129, 0.4);
+            margin-bottom: 4px;
+        }
+    </style>
+</head>
+
+<body>
+    <header class="main-header"
+        style="background: linear-gradient(135deg, #10B981, #059669); color: white; border-bottom: none;">
+        <div class="logo-area" onclick="window.location.href='index.html'" style="cursor: pointer;">
+            <i class="fa-solid fa-chevron-left" style="font-size: 18px; margin-right: 15px; color: white;"></i>
+            <h1 class="app-name" style="color: white; font-size: 18px; font-weight: 800;">buy xCoin use rupee</h1>
+        </div>
+        <div class="header-right">
+            <i class="fa-solid fa-house" onclick="window.location.href='index.html'"
+                style="color: white; font-size: 20px;"></i>
+        </div>
+    </header>
+
+    <div class="app-container" style="padding-top: 20px;">
+        <!-- Tab Bar -->
+        <div class="tab-bar-container" style="padding: 0 20px; margin-bottom: 20px;">
+            <div
+                style="display: flex; background: #ebfcf6; border: 1px solid #10B981; border-radius: 8px; padding: 2px;">
+                <div class="type-tab active" id="inrTab"
+                    style="flex: 1; padding: 8px; text-align: center; font-weight: 700; border-radius: 6px; cursor: pointer;">
+                    INR</div>
+                <div class="type-tab" id="usdtTab"
+                    style="flex: 1; padding: 8px; text-align: center; font-weight: 700; border-radius: 6px; cursor: pointer; color: #10B981;">
+                    USDT</div>
+            </div>
+        </div>
+
+        <!-- INR Tab Content -->
+        <div id="inrContent">
+            <!-- Range Tabs -->
+            <div class="range-tabs"
+                style="display: flex; gap: 10px; padding: 0 20px; margin-bottom: 20px; justify-content: flex-end;">
+                <div class="range-pill active" data-range="small">Small</div>
+                <div class="range-pill" data-range="medium">Medium</div>
+                <div class="range-pill" data-range="large">Large</div>
+            </div>
+
+            <div id="ordersList" style="padding-bottom: 100px;">
+                <!-- Orders will be loaded here -->
+            </div>
+        </div>
+
+        <!-- USDT Tab Content -->
+        <div id="usdtContent" style="display: none;">
+            <div class="usdt-container">
+                <h3 class="mb-2">Network</h3>
+                <div class="network-card">
+                    <img src="zv.webp" alt="USDT" style="width: 32px; height: 32px;">
+                    <span style="font-weight: 600;">TRC20</span>
+                    <i class="fa-solid fa-circle-check check"></i>
+                </div>
+                <p style="color: var(--danger); font-size: 12px; margin-bottom: 24px;"><span
+                        style="font-size: 16px;">•</span> Only accept TRC20 network</p>
+
+                <h3 class="mb-2">You transfer</h3>
+                <div class="input-group">
+                    <input type="number" id="usdtAmount" class="input-field" placeholder="Please enter the number"
+                        style="padding-left: 16px;">
+                    <span class="unit-label">USDT</span>
+                </div>
+                <div style="font-size: 12px; color: var(--danger); margin-bottom: 24px; line-height: 1.6;">
+                    <p>• The input range is [100,20000] and must be a multiple of 1.</p>
+                    <p>• If have transaction fee, don't forget to add it. The transfer amount must match the sell
+                        amount.</p>
+                </div>
+
+                <h3 class="mb-2">You deposit</h3>
+                <div class="input-group">
+                    <input type="text" id="depositAmount" class="input-field" readonly
+                        style="padding-left: 16px; background: white;">
+                    <span class="unit-label"><i class="fa-solid fa-coins"
+                            style="color: #F59E0B; position: static;"></i></span>
+                </div>
+
+                <button class="btn-gradient" id="usdtNext" style="margin-top: 20px;">NEXT</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bottom Navigation -->
+    <nav class="bottom-nav">
+        <a href="index.html" class="nav-item">
+            <i class="fa-solid fa-building-columns"></i>
+            <span data-key="home">Home</span>
+        </a>
+        <a href="purchase.html" class="nav-item active">
+            <i class="fa-solid fa-coins"></i>
+            <span data-key="purchase">Purchase</span>
+        </a>
+        <div class="tool-fab-container">
+            <a href="tool.html" class="tool-fab">
+                <i class="fa-solid fa-plus"></i>
+            </a>
+            <span style="font-size: 10px; font-weight: 700; color: var(--primary);">Tool</span>
+        </div>
+        <a href="team.html" class="nav-item">
+            <i class="fa-solid fa-chart-line"></i>
+            <span data-key="team">Team</span>
+        </a>
+        <a href="profile.html" class="nav-item">
+            <i class="fa-solid fa-user-tie"></i>
+            <span data-key="profile">Profile</span>
+        </a>
+    </nav>
+
+    <div class="loader-overlay" id="loader">
+        <div class="spinner"></div>
+    </div>
+
+    <!-- UPI Selection Popup -->
+    <div class="upi-popup-overlay" id="upiPopupOverlay">
+        <div class="upi-popup">
+            <h3 style="margin-bottom: 20px; font-weight: 700; color: var(--text-dark);">Select Tool</h3>
+            <p style="font-size: 13px; color: var(--text-gray); margin-bottom: 20px;">Choose a UPI account to proceed
+                with purchase.</p>
+            <div id="upiSelectionList" style="max-height: 300px; overflow-y: auto;">
+                <!-- UPI IDs will load here -->
+            </div>
+
+            <p id="toolWarningText"
+                style="color: #EF4444; font-size: 11px; line-height: 1.6; text-align: left; margin: 15px 0; font-weight: 600;">
+                <!-- Warning from settings -->
+            </p>
+
+            <div style="display: flex; gap: 12px; margin-top: 10px;">
+                <button class="btn-gradient" id="cancelUpiBtn"
+                    style="background: #F3F4F6; color: var(--text-gray);">Cancel</button>
+                <button class="btn-gradient" id="confirmUpiBtn">Confirm</button>
+            </div>
+        </div>
+    </div>
+
+    <script type="module" src="js/purchase.js"></script>
+    <script type="module" src="js/lang.js"></script>
+    <script type="module" src="js/ticker.js"></script>
+</body>
+
+</html>
